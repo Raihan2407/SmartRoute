@@ -1,252 +1,1228 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartRoute — Simulasi Rute</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartRoute — Mockup Aplikasi</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --bg: #080e1a;
+      --surface: #0d1b2a;
+      --card: #111827;
+      --border: #1e3a5f;
+      --cyan: #00d4ff;
+      --violet: #7c3aed;
+      --teal: #06b6d4;
+      --green: #10b981;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --white: #ffffff;
+      --off: #e2e8f0;
+      --muted: #64748b;
+      --text: #cbd5e1;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      height: 38px;
+      background: #060b14;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot.r {
+      background: #ef4444;
+    }
+
+    .dot.y {
+      background: #f59e0b;
+    }
+
+    .dot.g {
+      background: #10b981;
+    }
+
+    .url-bar {
+      flex: 1;
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .app {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 260px 1fr 220px;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ── */
+    .panel-left {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .panel-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--cyan), var(--teal));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .logo-sub {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .panel-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--off);
+      font-size: 12px;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color .2s;
+      position: relative;
+    }
+
+    .input-field:hover {
+      border-color: var(--cyan);
+    }
+
+    .input-field.active-input {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, .15);
+    }
+
+    .input-field.dest {
+      border-color: var(--violet);
+    }
+
+    .input-field.dest:hover {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, .15);
+    }
+
+    .dot-start {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .dot-end {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+
+    .connector-line {
+      width: 1px;
+      height: 10px;
+      background: var(--border);
+      margin: 3px auto 3px 19px;
+    }
+
+    /* algorithm selector */
+    .algo-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .algo-btn {
+      flex: 1;
+      padding: 7px 0;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+    }
+
+    .algo-btn.on-d {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0, 212, 255, .08);
+    }
+
+    .algo-btn.on-a {
+      border-color: var(--violet);
+      color: #a78bfa;
+      background: rgba(124, 58, 237, .08);
+    }
+
+    /* view mode */
+    .view-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .view-btn {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+    }
+
+    .view-btn.active {
+      border-color: var(--cyan);
+      color: var(--white);
+      background: rgba(0, 212, 255, .1);
+    }
+
+    /* speed slider */
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .speed-row input[type=range] {
+      flex: 1;
+      accent-color: var(--cyan);
+      cursor: pointer;
+    }
+
+    .speed-val {
+      font-size: 11px;
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+      min-width: 28px;
+    }
+
+    /* search button */
+    .btn-search {
+      width: calc(100% - 32px);
+      margin: 14px 16px;
+      padding: 11px;
+      background: var(--cyan);
+      color: #060b14;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: .5px;
+      transition: opacity .2s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-search:hover {
+      opacity: .9;
+    }
+
+    .btn-search:active {
+      transform: scale(.98);
+    }
+
+    .btn-search:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .btn-search.running {
+      background: var(--orange);
+      color: #060b14;
+    }
+
+    /* status badge */
+    .status-badge {
+      margin: 0 16px 14px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      display: none;
+    }
+
+    .status-badge.show {
+      display: block;
+    }
+
+    .status-badge.running {
+      background: rgba(245, 158, 11, .1);
+      border: 1px solid var(--orange);
+      color: var(--orange);
+    }
+
+    .status-badge.done {
+      background: rgba(16, 185, 129, .1);
+      border: 1px solid var(--green);
+      color: var(--green);
+    }
+
+    /* ── MAP AREA ── */
+    .map-area {
+      position: relative;
+      background: #060d18;
+      overflow: hidden;
+    }
+
+    canvas#mapCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 3D toggle indicator */
+    .view-indicator {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(6, 11, 20, .8);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 10px;
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* map controls */
+    .map-controls {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .map-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(13, 27, 42, .9);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--off);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+    }
+
+    .map-btn:hover {
+      background: var(--surface);
+      border-color: var(--cyan);
+    }
+
+    /* legend */
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(6, 11, 20, .85);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 10px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+    }
+
+    .legend-line {
+      width: 24px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    /* node tooltip */
+    .node-tip {
+      position: absolute;
+      background: rgba(13, 27, 42, .95);
+      border: 1px solid var(--cyan);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 10px;
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+      pointer-events: none;
+      display: none;
+      z-index: 10;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .panel-right {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .result-header {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .result-card {
+      margin: 10px 10px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .result-card-header {
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-card-header.dijkstra {
+      background: rgba(0, 212, 255, .08);
+      color: var(--cyan);
+      border-bottom: 1px solid rgba(0, 212, 255, .2);
+    }
+
+    .result-card-header.astar {
+      background: rgba(124, 58, 237, .08);
+      color: #a78bfa;
+      border-bottom: 1px solid rgba(124, 58, 237, .2);
+    }
+
+    .result-metrics {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .metric-val {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--off);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--card);
+      border-radius: 2px;
+      margin-top: 2px;
+      overflow: hidden;
+    }
+
+    .metric-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    .winner-badge {
+      margin: 10px 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, .08);
+      border: 1px solid rgba(16, 185, 129, .3);
+      text-align: center;
+      display: none;
+    }
+
+    .winner-badge.show {
+      display: block;
+    }
+
+    .winner-text {
+      font-size: 11px;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .winner-sub {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* step log */
+    .step-log {
+      margin: 10px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .step-log-header {
+      padding: 8px 12px;
+      font-size: 10px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .step-log-body {
+      padding: 8px;
+      flex: 1;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .log-line {
+      color: var(--muted);
+    }
+
+    .log-line.d {
+      color: #67e8f9;
+    }
+
+    .log-line.a {
+      color: #c4b5fd;
+    }
+
+    .log-line.done {
+      color: var(--green);
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="left-col">
-  <h1>SmartRoute — Simulasi Rute</h1>
-
-  <div class="panel">
-    <label>Start:</label>
-    <select id="start"></select>
-    <label>Tujuan:</label>
-    <select id="end"></select>
-    <button id="run-btn" onclick="startSimulation()">▶ Cari Rute Terbaik</button>
-    <button class="danger-btn" onclick="generateBrokenRoads()">⚡ Jalan Rusak</button>
-    <button class="reset-btn"  onclick="resetRoads()">↺ Reset Jalan</button>
-    <button class="random-btn" onclick="randomizeMap()">🎲 Acak Peta</button>
-    <label style="font-size:12px;">Kecepatan:</label>
-    <input type="range" id="speed-range" min="1" max="10" value="5" style="width:80px;"
-      oninput="SPEED=+this.value;document.getElementById('speed-val').textContent=this.value+'×'"/>
-    <span id="speed-val" style="font-size:12px;font-family:monospace;min-width:22px;">5×</span>
+  <!-- browser chrome -->
+  <div class="topbar">
+    <div class="dot r"></div>
+    <div class="dot y"></div>
+    <div class="dot g"></div>
+    <div class="url-bar">smartroute.app / navigate</div>
   </div>
 
-  <div id="svg-wrap">
-    <div id="step-ctr"></div>
-    <svg id="map" width="1000" height="650">
+  <!-- app -->
+  <div class="app">
 
-      <!-- dekorasi (pohon, gedung) -->
-      <g id="deco-layer"></g>
+    <!-- LEFT: controls -->
+    <div class="panel-left">
+      <div class="panel-header">
+        <div class="logo-icon">⬡</div>
+        <div>
+          <div class="logo-text">SmartRoute</div>
+          <div class="logo-sub">NAVIGASI CERDAS</div>
+        </div>
+      </div>
 
-      <!-- lapisan jalan -->
-      <path id="road-layer-1" stroke="#555"  stroke-width="44" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <path id="road-layer-2" stroke="#888"  stroke-width="38" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <path id="road-layer-3" stroke="white" stroke-width="2"  fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="18 18" opacity="0.6"/>
+      <div class="panel-section">
+        <div class="label">Titik Awal</div>
+        <div class="input-field active-input" id="startField" onclick="setPickMode('start')">
+          <div class="dot-start"></div>
+          <span id="startLabel">Klik peta untuk pilih start...</span>
+        </div>
+        <div class="connector-line"></div>
+        <div class="label">Titik Tujuan</div>
+        <div class="input-field dest" id="endField" onclick="setPickMode('end')">
+          <div class="dot-end"></div>
+          <span id="endLabel">Klik peta untuk pilih tujuan...</span>
+        </div>
+      </div>
 
-      <!-- visited overlays -->
-      <g id="visited-bfs-layer"></g>
-      <g id="visited-d-layer"></g>
-      <g id="visited-a-layer"></g>
+      <div class="panel-section">
+        <div class="label">Algoritma</div>
+        <div class="algo-btns">
+          <button class="algo-btn on-d" id="btnDijk" onclick="toggleAlgo('dijkstra')">Dijkstra</button>
+          <button class="algo-btn on-a" id="btnAstar" onclick="toggleAlgo('astar')">A*</button>
+        </div>
+      </div>
 
-      <!-- label nilai node (step-by-step) -->
-      <g id="node-labels-layer"></g>
+      <div class="panel-section">
+        <div class="label">Tampilan Peta</div>
+        <div class="view-btns">
+          <button class="view-btn active" id="btn2d" onclick="setView('2d')">2D Flat</button>
+          <button class="view-btn" id="btn3d" onclick="setView('3d')">3D Tilt</button>
+        </div>
+      </div>
 
-      <!-- jalur hasil algoritma -->
-      <path id="path-bfs"      stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 6" opacity="0"/>
-      <path id="path-dijkstra" stroke="#1565c0" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
-      <path id="path-astar"    stroke="#6a1b9a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="16 8" opacity="0"/>
+      <div class="panel-section">
+        <div class="label">Kecepatan Animasi</div>
+        <div class="speed-row">
+          <input type="range" id="speedRange" min="1" max="10" value="5" oninput="updateSpeed(this.value)">
+          <span class="speed-val" id="speedVal">5x</span>
+        </div>
+      </div>
 
-      <!-- jalan rusak -->
-      <g id="broken-roads-layer"></g>
-
-      <!-- highlight merah (dari original) -->
-      <path id="highlight-path" stroke="#e53935" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
-
-      <!-- bobot -->
-      <g id="weight-labels-layer"></g>
-
-      <!-- nodes -->
-      <g id="nodes-group"></g>
-
-      <!-- flag kuning = source (sesuai RPM) -->
-      <g id="flag-start" opacity="0">
-        <line x1="0" y1="0" x2="0" y2="-32" stroke="#ffd600" stroke-width="3"/>
-        <polygon points="0,-32 18,-24 0,-16" fill="#ffd600"/>
-        <circle cx="0" cy="0" r="4" fill="#ffd600"/>
-      </g>
-
-      <!-- flag merah = destination (sesuai RPM) -->
-      <g id="flag-end" opacity="0">
-        <line x1="0" y1="0" x2="0" y2="-32" stroke="#e53935" stroke-width="3"/>
-        <polygon points="0,-32 18,-24 0,-16" fill="#e53935"/>
-        <circle cx="0" cy="0" r="4" fill="#e53935"/>
-      </g>
-
-      <!--
-        CAR — dipisah menjadi 2 elemen:
-
-        1. car-body  → ikut animateMotion + rotate="auto"
-                        hanya bodi + jendela + lampu
-                        TIDAK ada roda di sini
-
-        2. car-wheels → posisi di-update manual via requestAnimationFrame
-                         roda berputar dengan CSS, TIDAK ikut rotate path
-                         sehingga tidak "muter-muter"
-      -->
-
-      <!-- BODI MOBIL -->
-      <g id="car-body" opacity="1">
-        <ellipse cx="0" cy="4" rx="13" ry="5" fill="rgba(0,0,0,0.3)"/>
-        <rect x="-14" y="-9" width="28" height="15" fill="#e53935" rx="4"/>
-        <rect x="-11" y="-8" width="10" height="8" fill="#b3c8e8" rx="2" opacity="0.85"/>
-        <rect x="1"   y="-8" width="10" height="8" fill="#b3c8e8" rx="2" opacity="0.85"/>
-        <circle cx="-9" cy="-10" r="2" fill="#fff9c4" opacity="0.9"/>
-        <circle cx="9"  cy="-10" r="2" fill="#fff9c4" opacity="0.9"/>
-      </g>
-
-      <!-- RODA MOBIL — berputar CSS, posisi di-update manual -->
-      <g id="car-wheels" opacity="0">
-        <!-- roda kiri -->
-        <g transform="translate(-7,6)">
-          <circle cx="0" cy="0" r="4.5" fill="#111"/>
-          <g class="wheel-inner">
-            <line x1="-3" y1="0" x2="3" y2="0" stroke="white" stroke-width="1.2"/>
-            <line x1="0" y1="-3" x2="0" y2="3" stroke="white" stroke-width="1.2"/>
-          </g>
-        </g>
-        <!-- roda kanan -->
-        <g transform="translate(7,6)">
-          <circle cx="0" cy="0" r="4.5" fill="#111"/>
-          <g class="wheel-inner">
-            <line x1="-3" y1="0" x2="3" y2="0" stroke="white" stroke-width="1.2"/>
-            <line x1="0" y1="-3" x2="0" y2="3" stroke="white" stroke-width="1.2"/>
-          </g>
-        </g>
-      </g>
-
-    </svg>
-  </div>
-
-  <div id="result">Pilih rute lalu klik <b>▶ Cari Rute Terbaik</b>.</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════
-     PANEL KANAN
-     ═══════════════════════════════════════════════ -->
-<div id="right-panel">
-
-  <!-- Dijkstra card -->
-  <div class="algo-card" id="card-d">
-    <div class="algo-card-head dijkstra">◈ Dijkstra <span class="badge">O((V+E)logV)</span></div>
-    <div class="algo-card-body">
-      <div class="metric-row"><span class="metric-label">Jarak</span>     <span class="metric-val" id="d-dist">—</span></div>
-      <div class="metric-row"><span class="metric-label">Waktu</span>      <span class="metric-val" id="d-time">—</span></div>
-      <div class="metric-bar-wrap"><div class="metric-bar d" id="bar-d-time"></div></div>
-      <div class="metric-row"><span class="metric-label">Node dikunjungi</span><span class="metric-val" id="d-nodes">—</span></div>
-      <div class="metric-bar-wrap"><div class="metric-bar d" id="bar-d-nodes"></div></div>
-      <div class="metric-row"><span class="metric-label">Rute</span>
-        <span class="metric-val" id="d-path" style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span></div>
+      <div class="status-badge" id="statusBadge">Menjalankan algoritma...</div>
+      <button class="btn-search" id="searchBtn" onclick="runSearch()" disabled>
+        ▶ &nbsp;CARI RUTE
+      </button>
+      <button class="btn-search running" id="resetBtn" onclick="resetAll()"
+        style="display:none; background: var(--muted);">
+        ↺ &nbsp;RESET
+      </button>
     </div>
-  </div>
 
-  <!-- A* card -->
-  <div class="algo-card" id="card-a">
-    <div class="algo-card-head astar">◈ A-Star <span class="badge">O(E log V)</span></div>
-    <div class="algo-card-body">
-      <div class="metric-row"><span class="metric-label">Jarak</span>     <span class="metric-val" id="a-dist">—</span></div>
-      <div class="metric-row"><span class="metric-label">Waktu</span>      <span class="metric-val" id="a-time">—</span></div>
-      <div class="metric-bar-wrap"><div class="metric-bar a" id="bar-a-time"></div></div>
-      <div class="metric-row"><span class="metric-label">Node dikunjungi</span><span class="metric-val" id="a-nodes">—</span></div>
-      <div class="metric-bar-wrap"><div class="metric-bar a" id="bar-a-nodes"></div></div>
-      <div class="metric-row"><span class="metric-label">Rute</span>
-        <span class="metric-val" id="a-path" style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span></div>
+    <!-- CENTER: map -->
+    <div class="map-area" id="mapArea">
+      <canvas id="mapCanvas"></canvas>
+      <div class="view-indicator" id="viewInd">● 2D MODE</div>
+      <div class="node-tip" id="nodeTip"></div>
+      <div class="map-controls">
+        <div class="map-btn" onclick="zoomIn()">+</div>
+        <div class="map-btn" onclick="zoomOut()">−</div>
+        <div class="map-btn" title="Reset view" onclick="resetView()">⌂</div>
+      </div>
+      <div class="legend">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:2px;letter-spacing:1px;">LEGENDA</div>
+        <div class="legend-row">
+          <div class="legend-line" style="background:var(--border)"></div>Jalan
+        </div>
+        <div class="legend-row">
+          <div class="legend-line" style="background:var(--cyan)"></div>Rute Dijkstra
+        </div>
+        <div class="legend-row">
+          <div class="legend-line" style="background:#a78bfa"></div>Rute A*
+        </div>
+        <div class="legend-row">
+          <div class="legend-line"
+            style="background:var(--orange);height:2px;border-radius:0;border-top:1px dashed var(--orange)"></div>Node
+          dikunjungi
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- BFS card (baseline) -->
-  <div class="algo-card" id="card-b">
-    <div class="algo-card-head bfs">◈ BFS <span class="badge">O(V+E) · baseline</span></div>
-    <div class="algo-card-body">
-      <div class="metric-row"><span class="metric-label">Jarak</span>     <span class="metric-val" id="b-dist">—</span></div>
-      <div class="metric-row"><span class="metric-label">Waktu</span>      <span class="metric-val" id="b-time">—</span></div>
-      <div class="metric-bar-wrap"><div class="metric-bar b" id="bar-b-time"></div></div>
-      <div class="metric-row"><span class="metric-label">Node dikunjungi</span><span class="metric-val" id="b-nodes">—</span></div>
-      <div class="metric-bar-wrap"><div class="metric-bar b" id="bar-b-nodes"></div></div>
-      <div class="metric-row"><span class="metric-label">Rute</span>
-        <span class="metric-val" id="b-path" style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span></div>
+    <!-- RIGHT: results -->
+    <div class="panel-right">
+      <div class="result-header">📊 Hasil Perbandingan</div>
+
+      <div class="result-card">
+        <div class="result-card-header dijkstra">
+          <span>◈</span> Dijkstra
+        </div>
+        <div class="result-metrics">
+          <div>
+            <div class="metric-row">
+              <span class="metric-label">Jarak</span>
+              <span class="metric-val" id="d-dist">—</span>
+            </div>
+          </div>
+          <div>
+            <div class="metric-row">
+              <span class="metric-label">Waktu</span>
+              <span class="metric-val" id="d-time">—</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="d-time-bar" style="background:var(--cyan);width:0%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="metric-row">
+              <span class="metric-label">Node Dikunjungi</span>
+              <span class="metric-val" id="d-nodes">—</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="d-node-bar" style="background:var(--cyan);width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-card" style="margin-top:8px;">
+        <div class="result-card-header astar">
+          <span>◈</span> A*
+        </div>
+        <div class="result-metrics">
+          <div>
+            <div class="metric-row">
+              <span class="metric-label">Jarak</span>
+              <span class="metric-val" id="a-dist">—</span>
+            </div>
+          </div>
+          <div>
+            <div class="metric-row">
+              <span class="metric-label">Waktu</span>
+              <span class="metric-val" id="a-time">—</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="a-time-bar" style="background:#a78bfa;width:0%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="metric-row">
+              <span class="metric-label">Node Dikunjungi</span>
+              <span class="metric-val" id="a-nodes">—</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" id="a-node-bar" style="background:#a78bfa;width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="winner-badge" id="winnerBadge">
+        <div class="winner-text" id="winnerText"></div>
+        <div class="winner-sub" id="winnerSub"></div>
+      </div>
+
+      <div class="step-log">
+        <div class="step-log-header">// EXECUTION LOG</div>
+        <div class="step-log-body" id="logBody">
+          <div class="log-line">Pilih titik awal dan tujuan...</div>
+        </div>
+      </div>
     </div>
+
   </div>
 
-  <!-- Complexity info -->
-  <div class="complexity-box">
-    <div class="ct">// KOMPLEKSITAS WAKTU</div>
-    <hr/>
-    <span class="ct">Dijkstra</span> — Min-Heap Binary<br/>
-    T = <b class="ct">O((V+E) log V)</b> &nbsp; S = O(V)<br/>
-    ✅ Optimal untuk bobot ≥ 0<br/>
-    <hr/>
-    <span class="ca">A* (A-Star)</span> — f(n)=g(n)+h(n)<br/>
-    h(n) = Euclidean×0.40 <span class="cg">[admissible]</span><br/>
-    T = <b class="ca">O(E log V)</b> avg &nbsp; S = O(V)<br/>
-    ✅ h admissible → A* optimal<br/>
-    <hr/>
-    <span class="cb">BFS</span> — Queue (FIFO)<br/>
-    T = <b class="cb">O(V+E)</b> &nbsp; S = O(V)<br/>
-    ❌ Abaikan bobot → bukan terpendek
-  </div>
+  <script>
+    // ── STATE ────────────────────────────────────────────────────────
+    const state = {
+      pickMode: 'start',
+      startNode: null,
+      endNode: null,
+      algoD: true,
+      algoA: true,
+      view: '2d',
+      speed: 5,
+      running: false,
+      zoom: 1,
+      tilt: 0,
+    };
 
-  <!-- Analisis Amortisasi & Recurrence (materi PAA Mg 4-5) -->
-  <div class="complexity-box" id="extra-analysis">
-    <div class="ct">// ANALISIS LANJUTAN</div>
-    <hr/>
-    <b style="color:#388e3c;">Analisis Amortisasi</b><br/>
-    Min-Heap push/pop: O(log n) worst case<br/>
-    Amortized per operasi: <b style="color:#388e3c;">O(log n)</b><br/>
-    Total n operasi: O(n log n)<br/>
-    <hr/>
-    <b style="color:#0288d1;">Recurrence Equation</b><br/>
-    Dijkstra via T(n):<br/>
-    <span style="font-family:monospace;font-size:9px;">T(V,E) = V·O(log V) + E·O(log V)</span><br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b style="color:#0288d1;">O((V+E) log V)</b><br/>
-    <hr/>
-    <b style="color:#7b1fa2;">Time & Space Complexity</b><br/>
-    BFS &nbsp;&nbsp; T=O(V+E) &nbsp; S=O(V)<br/>
-    Dijkstra T=O((V+E)logV) S=O(V)<br/>
-    A* &nbsp;&nbsp;&nbsp; T=O(E logV) &nbsp;S=O(V)
-  </div>
+    // ── GRAPH ────────────────────────────────────────────────────────
+    // Simulated graph of Tanjungpinang road network nodes
+    const NODES = [
+      { id: 0, x: .12, y: .75, name: 'UMRAH / Teknik' },
+      { id: 1, x: .20, y: .65, name: 'Simpang Suka Berenang' },
+      { id: 2, x: .30, y: .55, name: 'Jl. Soekarno Hatta' },
+      { id: 3, x: .38, y: .45, name: 'Simpang Polsek Bukit Bestari' },
+      { id: 4, x: .25, y: .40, name: 'Jl. D.I. Panjaitan' },
+      { id: 5, x: .45, y: .35, name: 'Simpang Engku Putri' },
+      { id: 6, x: .55, y: .30, name: 'Jl. Raja Haji Fisabilillah' },
+      { id: 7, x: .65, y: .28, name: 'Simpang Batu 8' },
+      { id: 8, x: .72, y: .22, name: 'Bandara RHF' },
+      { id: 9, x: .50, y: .50, name: 'Pusat Kota Tanjungpinang' },
+      { id: 10, x: .60, y: .55, name: 'Jl. Merdeka' },
+      { id: 11, x: .70, y: .60, name: 'Simpang Raya' },
+      { id: 12, x: .40, y: .62, name: 'Jl. Tepi Laut' },
+      { id: 13, x: .30, y: .70, name: 'Pelabuhan Sri Bintan Pura' },
+      { id: 14, x: .80, y: .45, name: 'Tanjung Unggat' },
+      { id: 15, x: .85, y: .35, name: 'Simpang Bandara' },
+    ];
 
-  <!-- Comparison table -->
-  <div class="cmp-table-wrap" id="cmp-table">
-    <table>
-      <tr>
-        <th>Metrik</th>
-        <th style="color:#1565c0;">Dijkstra</th>
-        <th style="color:#6a1b9a;">A*</th>
-        <th style="color:#e65100;">BFS</th>
-        <th style="color:#2e7d32;">Terbaik</th>
-      </tr>
-      <tbody id="cmp-tbody"></tbody>
-    </table>
-  </div>
+    const EDGES = [
+      [0, 1, 1.2], [1, 2, 1.5], [2, 3, 1.8], [3, 4, 1.3], [4, 5, 2.0],
+      [5, 6, 1.4], [6, 7, 1.6], [7, 8, 1.5], [3, 9, 1.1], [9, 10, 1.2],
+      [10, 11, 1.0], [9, 5, 1.3], [1, 4, 1.8], [2, 12, 1.0], [12, 13, 1.5],
+      [12, 9, 1.2], [11, 14, 1.4], [14, 15, 1.1], [15, 8, 1.3], [10, 5, 1.5],
+      [6, 15, 2.1], [7, 14, 1.2], [3, 5, 2.5], [0, 13, 2.8], [4, 12, 1.6],
+    ];
 
-  <!-- Winner -->
-  <div class="winner-badge" id="winner-badge">
-    <div class="wt" id="winner-title"></div>
-    <div class="ws" id="winner-sub"></div>
-  </div>
+    // Build adjacency
+    const adj = {};
+    NODES.forEach(n => adj[n.id] = []);
+    EDGES.forEach(([a, b, w]) => {
+      adj[a].push({ to: b, w });
+      adj[b].push({ to: a, w });
+    });
 
-  <!-- Evaluasi algoritma -->
-  <div id="eval-box"></div>
+    // ── CANVAS SETUP ────────────────────────────────────────────────
+    const canvas = document.getElementById('mapCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
 
-  <!-- Log -->
-  <div class="log-box">
-    <div class="log-head">
-      <span>// EXECUTION LOG</span>
-      <span class="log-clr" onclick="clearLog()">✕ clear</span>
-    </div>
-    <div class="log-body" id="log-body">
-      <div class="ll inf">Pilih titik awal &amp; tujuan → klik ▶ Cari Rute Terbaik.</div>
-      <div class="ll inf">Klik 🎲 Acak Peta untuk mengacak peta, start &amp; end.</div>
-    </div>
-  </div>
+    function resize() {
+      const area = document.getElementById('mapArea');
+      W = canvas.width = area.clientWidth;
+      H = canvas.height = area.clientHeight;
+      draw();
+    }
+    window.addEventListener('resize', resize);
 
-</div>
+    function nx(n) { return n.x * W * state.zoom + (W * (1 - state.zoom) / 2); }
+    function ny(n) {
+      let y = n.y * H * state.zoom + (H * (1 - state.zoom) / 2);
+      if (state.view === '3d') y = y * 0.7 + H * 0.15; // perspective tilt
+      return y;
+    }
 
-<script src="main.js"></script>
+    // ── DRAW ────────────────────────────────────────────────────────
+    let visitedD = new Set(), visitedA = new Set();
+    let pathD = [], pathA = [];
+    let done = false;
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // bg grid
+      ctx.strokeStyle = 'rgba(30,58,95,0.3)';
+      ctx.lineWidth = .5;
+      const step = 60 * state.zoom;
+      for (let x = 0; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+      for (let y = 0; y < H; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+      // draw edges
+      EDGES.forEach(([a, b]) => {
+        const na = NODES[a], nb = NODES[b];
+        ctx.beginPath();
+        ctx.moveTo(nx(na), ny(na));
+        ctx.lineTo(nx(nb), ny(nb));
+        ctx.strokeStyle = 'rgba(30,58,95,0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+
+      // draw visited D
+      if (visitedD.size > 0) {
+        EDGES.forEach(([a, b]) => {
+          if (visitedD.has(a) && visitedD.has(b)) {
+            const na = NODES[a], nb = NODES[b];
+            ctx.beginPath(); ctx.moveTo(nx(na), ny(na)); ctx.lineTo(nx(nb), ny(nb));
+            ctx.strokeStyle = 'rgba(0,212,255,0.25)'; ctx.lineWidth = 3; ctx.stroke();
+          }
+        });
+        visitedD.forEach(id => {
+          const n = NODES[id];
+          ctx.beginPath();
+          ctx.arc(nx(n), ny(n), 4, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,212,255,0.4)'; ctx.fill();
+        });
+      }
+
+      // draw visited A
+      if (visitedA.size > 0) {
+        EDGES.forEach(([a, b]) => {
+          if (visitedA.has(a) && visitedA.has(b)) {
+            const na = NODES[a], nb = NODES[b];
+            ctx.beginPath(); ctx.moveTo(nx(na), ny(na)); ctx.lineTo(nx(nb), ny(nb));
+            ctx.strokeStyle = 'rgba(167,139,250,0.25)'; ctx.lineWidth = 3; ctx.stroke();
+          }
+        });
+        visitedA.forEach(id => {
+          const n = NODES[id];
+          ctx.beginPath();
+          ctx.arc(nx(n), ny(n), 4, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(167,139,250,0.4)'; ctx.fill();
+        });
+      }
+
+      // draw final path D
+      if (pathD.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(nx(NODES[pathD[0]]), ny(NODES[pathD[0]]));
+        for (let i = 1; i < pathD.length; i++) ctx.lineTo(nx(NODES[pathD[i]]), ny(NODES[pathD[i]]));
+        ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 4;
+        ctx.shadowColor = '#00d4ff'; ctx.shadowBlur = 12;
+        ctx.stroke(); ctx.shadowBlur = 0;
+      }
+
+      // draw final path A
+      if (pathA.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(nx(NODES[pathA[0]]), ny(NODES[pathA[0]]));
+        for (let i = 1; i < pathA.length; i++) ctx.lineTo(nx(NODES[pathA[i]]), ny(NODES[pathA[i]]));
+        ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 4;
+        ctx.shadowColor = '#a78bfa'; ctx.shadowBlur = 12;
+        ctx.setLineDash([8, 4]); ctx.stroke(); ctx.setLineDash([]); ctx.shadowBlur = 0;
+      }
+
+      // draw nodes
+      NODES.forEach(n => {
+        const x = nx(n), y = ny(n);
+        const isStart = state.startNode === n.id;
+        const isEnd = state.endNode === n.id;
+        const r = (isStart || isEnd) ? 9 : 5;
+        const color = isStart ? '#10b981' : isEnd ? '#ef4444' : '#1e3a5f';
+        const stroke = isStart ? '#10b981' : isEnd ? '#ef4444' : '#00d4ff';
+
+        // 3d shadow effect
+        if (state.view === '3d') {
+          ctx.beginPath(); ctx.arc(x + 2, y + 2, r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fill();
+        }
+
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = color; ctx.fill();
+        ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke();
+
+        if (isStart) {
+          ctx.fillStyle = '#10b981'; ctx.font = 'bold 8px Space Grotesk';
+          ctx.fillText('START', x + 12, y + 4);
+        }
+        if (isEnd) {
+          ctx.fillStyle = '#ef4444'; ctx.font = 'bold 8px Space Grotesk';
+          ctx.fillText('TUJUAN', x + 12, y + 4);
+        }
+      });
+    }
+
+    // ── INTERACTION ─────────────────────────────────────────────────
+    function setPickMode(mode) {
+      state.pickMode = mode;
+      document.getElementById('startField').classList.toggle('active-input', mode === 'start');
+      document.getElementById('endField').classList.toggle('dest', true);
+    }
+
+    canvas.addEventListener('click', e => {
+      if (state.running || done) return;
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      let closest = null, minDist = 999;
+      NODES.forEach(n => {
+        const d = Math.hypot(nx(n) - cx, ny(n) - cy);
+        if (d < minDist) { minDist = d; closest = n; }
+      });
+
+      if (minDist > 30) return;
+
+      if (state.pickMode === 'start') {
+        state.startNode = closest.id;
+        document.getElementById('startLabel').textContent = closest.name;
+        state.pickMode = 'end';
+      } else {
+        state.endNode = closest.id;
+        document.getElementById('endLabel').textContent = closest.name;
+        state.pickMode = 'start';
+      }
+
+      const canSearch = state.startNode !== null && state.endNode !== null && state.startNode !== state.endNode;
+      document.getElementById('searchBtn').disabled = !canSearch;
+      draw();
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+      const tip = document.getElementById('nodeTip');
+      let closest = null, minDist = 999;
+      NODES.forEach(n => {
+        const d = Math.hypot(nx(n) - cx, ny(n) - cy);
+        if (d < minDist) { minDist = d; closest = n; }
+      });
+      if (minDist < 25) {
+        tip.style.display = 'block';
+        tip.style.left = (cx + 15) + 'px'; tip.style.top = (cy - 10) + 'px';
+        tip.textContent = closest.name;
+      } else {
+        tip.style.display = 'none';
+      }
+    });
+
+    // ── ALGORITHMS ──────────────────────────────────────────────────
+    function dijkstra(start, end) {
+      const dist = {}, prev = {}, visited = [];
+      NODES.forEach(n => dist[n.id] = Infinity);
+      dist[start] = 0;
+      const pq = [{ id: start, d: 0 }];
+      while (pq.length) {
+        pq.sort((a, b) => a.d - b.d);
+        const { id } = pq.shift();
+        if (visited.includes(id)) continue;
+        visited.push(id);
+        if (id === end) break;
+        adj[id].forEach(({ to, w }) => {
+          const nd = dist[id] + w;
+          if (nd < dist[to]) { dist[to] = nd; prev[to] = id; pq.push({ id: to, d: nd }); }
+        });
+      }
+      const path = [];
+      let cur = end;
+      while (cur !== undefined) { path.unshift(cur); cur = prev[cur]; }
+      return { visited, path, dist: dist[end] };
+    }
+
+    function heuristic(a, b) {
+      const na = NODES[a], nb = NODES[b];
+      return Math.hypot(na.x - nb.x, na.y - nb.y) * 10;
+    }
+
+    function astar(start, end) {
+      const g = {}, f = {}, prev = {}, visited = [];
+      NODES.forEach(n => { g[n.id] = Infinity; f[n.id] = Infinity; });
+      g[start] = 0; f[start] = heuristic(start, end);
+      const open = [start];
+      while (open.length) {
+        open.sort((a, b) => f[a] - f[b]);
+        const cur = open.shift();
+        visited.push(cur);
+        if (cur === end) break;
+        adj[cur].forEach(({ to, w }) => {
+          const ng = g[cur] + w;
+          if (ng < g[to]) {
+            g[to] = ng; f[to] = ng + heuristic(to, end);
+            prev[to] = cur;
+            if (!open.includes(to)) open.push(to);
+          }
+        });
+      }
+      const path = [];
+      let c = end;
+      while (c !== undefined) { path.unshift(c); c = prev[c]; }
+      return { visited, path, dist: g[end] };
+    }
+
+    // ── RUN ANIMATION ───────────────────────────────────────────────
+    function addLog(text, type = '') {
+      const body = document.getElementById('logBody');
+      const line = document.createElement('div');
+      line.className = 'log-line ' + (type || '');
+      line.textContent = text;
+      body.appendChild(line);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    async function runSearch() {
+      if (state.startNode === null || state.endNode === null) return;
+      state.running = true;
+      done = false;
+      visitedD = new Set(); visitedA = new Set();
+      pathD = []; pathA = [];
+
+      document.getElementById('searchBtn').style.display = 'none';
+      document.getElementById('resetBtn').style.display = 'none';
+      const badge = document.getElementById('statusBadge');
+      badge.className = 'status-badge show running';
+      badge.textContent = '⏳ Menjalankan algoritma...';
+
+      // reset results
+      ['d-dist', 'd-time', 'd-nodes', 'a-dist', 'a-time', 'a-nodes'].forEach(id => document.getElementById(id).textContent = '—');
+      ['d-time-bar', 'd-node-bar', 'a-time-bar', 'a-node-bar'].forEach(id => document.getElementById(id).style.width = '0%');
+      document.getElementById('winnerBadge').classList.remove('show');
+      document.getElementById('logBody').innerHTML = '';
+
+      const delay = ms => new Promise(r => setTimeout(r, ms));
+      const animDelay = () => delay(Math.max(20, 250 / state.speed));
+
+      // Run Dijkstra
+      addLog('// Dijkstra dimulai dari node ' + state.startNode, 'd');
+      const t0d = performance.now();
+      const resD = dijkstra(state.startNode, state.endNode);
+      const t1d = performance.now();
+
+      if (state.algoD) {
+        for (let i = 0; i < resD.visited.length; i++) {
+          visitedD.add(resD.visited[i]);
+          if (i % 2 === 0) { draw(); await animDelay(); }
+          addLog(`  [D] node ${resD.visited[i]} → ${NODES[resD.visited[i]].name}`, 'd');
+        }
+        pathD = resD.path; draw();
+        addLog(`  [D] Rute ditemukan! Panjang: ${resD.path.length} node`, 'done');
+      }
+
+      // Run A*
+      addLog('// A* dimulai dari node ' + state.startNode, 'a');
+      const t0a = performance.now();
+      const resA = astar(state.startNode, state.endNode);
+      const t1a = performance.now();
+
+      if (state.algoA) {
+        for (let i = 0; i < resA.visited.length; i++) {
+          visitedA.add(resA.visited[i]);
+          if (i % 2 === 0) { draw(); await animDelay(); }
+          addLog(`  [A*] node ${resA.visited[i]} → ${NODES[resA.visited[i]].name}`, 'a');
+        }
+        pathA = resA.path; draw();
+        addLog(`  [A*] Rute ditemukan! Panjang: ${resA.path.length} node`, 'done');
+      }
+
+      // Show results
+      const dTime = (t1d - t0d).toFixed(2);
+      const aTime = (t1a - t0a).toFixed(2);
+      const maxTime = Math.max(parseFloat(dTime), parseFloat(aTime));
+      const maxNodes = Math.max(resD.visited.length, resA.visited.length);
+
+      document.getElementById('d-dist').textContent = (resD.dist * 0.8).toFixed(1) + ' km';
+      document.getElementById('d-time').textContent = dTime + ' ms';
+      document.getElementById('d-nodes').textContent = resD.visited.length + ' node';
+      document.getElementById('d-time-bar').style.width = (parseFloat(dTime) / maxTime * 100) + '%';
+      document.getElementById('d-node-bar').style.width = (resD.visited.length / maxNodes * 100) + '%';
+
+      document.getElementById('a-dist').textContent = (resA.dist * 0.8).toFixed(1) + ' km';
+      document.getElementById('a-time').textContent = aTime + ' ms';
+      document.getElementById('a-nodes').textContent = resA.visited.length + ' node';
+      document.getElementById('a-time-bar').style.width = (parseFloat(aTime) / maxTime * 100) + '%';
+      document.getElementById('a-node-bar').style.width = (resA.visited.length / maxNodes * 100) + '%';
+
+      const faster = parseFloat(dTime) > parseFloat(aTime) ? 'A*' : 'Dijkstra';
+      const ratio = (Math.max(parseFloat(dTime), parseFloat(aTime)) / Math.min(parseFloat(dTime), parseFloat(aTime))).toFixed(1);
+      document.getElementById('winnerText').textContent = faster + ' lebih efisien!';
+      document.getElementById('winnerSub').textContent = faster + ' mengunjungi ' + Math.min(resD.visited.length, resA.visited.length) + ' node vs ' + Math.max(resD.visited.length, resA.visited.length) + ' node';
+      document.getElementById('winnerBadge').classList.add('show');
+
+      addLog('// Selesai! ' + faster + ' ' + ratio + 'x lebih cepat', 'done');
+
+      badge.className = 'status-badge show done';
+      badge.textContent = '✓ Rute berhasil ditemukan';
+
+      state.running = false;
+      done = true;
+      document.getElementById('resetBtn').style.display = 'flex';
+    }
+
+    function resetAll() {
+      state.startNode = null; state.endNode = null;
+      visitedD = new Set(); visitedA = new Set();
+      pathD = []; pathA = []; done = false;
+      document.getElementById('startLabel').textContent = 'Klik peta untuk pilih start...';
+      document.getElementById('endLabel').textContent = 'Klik peta untuk pilih tujuan...';
+      document.getElementById('searchBtn').disabled = true;
+      document.getElementById('searchBtn').style.display = 'flex';
+      document.getElementById('resetBtn').style.display = 'none';
+      document.getElementById('statusBadge').classList.remove('show');
+      document.getElementById('winnerBadge').classList.remove('show');
+      document.getElementById('logBody').innerHTML = '<div class="log-line">Pilih titik awal dan tujuan...</div>';
+      ['d-dist', 'd-time', 'd-nodes', 'a-dist', 'a-time', 'a-nodes'].forEach(id => document.getElementById(id).textContent = '—');
+      ['d-time-bar', 'd-node-bar', 'a-time-bar', 'a-node-bar'].forEach(id => document.getElementById(id).style.width = '0%');
+      draw();
+    }
+
+    function toggleAlgo(a) {
+      if (a === 'dijkstra') { state.algoD = !state.algoD; document.getElementById('btnDijk').classList.toggle('on-d', state.algoD); }
+      else { state.algoA = !state.algoA; document.getElementById('btnAstar').classList.toggle('on-a', state.algoA); }
+    }
+
+    function setView(v) {
+      state.view = v;
+      document.getElementById('btn2d').classList.toggle('active', v === '2d');
+      document.getElementById('btn3d').classList.toggle('active', v === '3d');
+      document.getElementById('viewInd').textContent = v === '3d' ? '◈ 3D MODE' : '● 2D MODE';
+      draw();
+    }
+
+    function updateSpeed(v) { state.speed = parseInt(v); document.getElementById('speedVal').textContent = v + 'x'; }
+
+    function zoomIn() { state.zoom = Math.min(state.zoom * 1.2, 3); draw(); }
+    function zoomOut() { state.zoom = Math.max(state.zoom / 1.2, 0.5); draw(); }
+    function resetView() { state.zoom = 1; draw(); }
+
+    // ── INIT ────────────────────────────────────────────────────────
+    resize();
+  </script>
 </body>
+
 </html>
