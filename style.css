@@ -1,0 +1,594 @@
+/* SmartRoute — style.css | PAA 2026 · UMRAH */
+
+/* ── BASE ── */
+body {
+  margin: 0;
+  background: #dfefff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 20px;
+}
+
+h1 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.panel {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: white;
+  padding: 15px 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+select,
+button {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  cursor: pointer;
+  background-color: #1565c0;
+  color: white;
+  font-weight: bold;
+  border: none;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background-color: #0d47a1;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.danger-btn {
+  background: #d32f2f;
+}
+
+.danger-btn:hover {
+  background: #9a0007;
+}
+
+.reset-btn {
+  background: #2e7d32;
+}
+
+.reset-btn:hover {
+  background: #1b5e20;
+}
+
+.random-btn {
+  background: #6a1b9a;
+}
+
+.random-btn:hover {
+  background: #4a148c;
+}
+
+/* ── MAP ── */
+svg#map {
+  background: #7bb565;
+  border: 4px solid #333;
+  border-radius: 12px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.node {
+  fill: #fff;
+  stroke: #1565c0;
+  stroke-width: 4;
+}
+
+.label-text {
+  font-size: 13px;
+  font-weight: bold;
+  fill: #222;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.weight-label {
+  font-size: 10px;
+  font-weight: bold;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.broken-road {
+  stroke: #ff0000 !important;
+  stroke-width: 12;
+  stroke-dasharray: 12 12;
+  fill: none;
+  stroke-linecap: round;
+}
+
+/* ── CAR WHEELS — spin hanya roda, tidak ikut rotate path ── */
+.wheel-inner {
+  transform-origin: 0px 0px;
+}
+
+.wheel-spin {
+  animation: spinning 0.4s linear infinite;
+}
+
+@keyframes spinning {
+  from {
+    transform: rotate(0deg)
+  }
+
+  to {
+    transform: rotate(360deg)
+  }
+}
+
+/* ── NODE ANIMATIONS ── */
+@keyframes nodePop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  70% {
+    transform: scale(1.3);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.node-anim {
+  animation: nodePop 0.35s ease forwards;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ── RESULT BOX ── */
+#result {
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-width: 400px;
+}
+
+/* ── STEP COUNTER ── */
+#svg-wrap {
+  position: relative;
+}
+
+#step-ctr {
+  display: none;
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: rgba(0, 0, 0, .72);
+  color: #ffcc00;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* ── LEFT COLUMN ── */
+#left-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════
+   PANEL KANAN
+   ══════════════════════════════════════════════════════ */
+#right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 340px;
+  align-self: flex-start;
+}
+
+/* algo cards */
+.algo-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.algo-card.win-card {
+  box-shadow: 0 0 0 3px #2e7d32, 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.algo-card-head {
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.algo-card-head.dijkstra {
+  background: #1565c0;
+  color: white;
+}
+
+.algo-card-head.astar {
+  background: #6a1b9a;
+  color: white;
+}
+
+.algo-card-head.bfs {
+  background: #e65100;
+  color: white;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 9px;
+  letter-spacing: .5px;
+}
+
+.algo-card-body {
+  padding: 9px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.metric-label {
+  color: #666;
+}
+
+.metric-val {
+  font-weight: bold;
+  color: #222;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.metric-bar-wrap {
+  width: 100%;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.metric-bar {
+  height: 100%;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 1s ease;
+}
+
+.metric-bar.d {
+  background: #1565c0;
+}
+
+.metric-bar.a {
+  background: #6a1b9a;
+}
+
+.metric-bar.b {
+  background: #e65100;
+}
+
+/* complexity box */
+.complexity-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 11px 14px;
+  font-size: 10px;
+  line-height: 1.7;
+  color: #444;
+  font-family: monospace;
+}
+
+.complexity-box .ct {
+  font-weight: bold;
+  color: #1565c0;
+  font-size: 11px;
+}
+
+.complexity-box .ca {
+  font-weight: bold;
+  color: #6a1b9a;
+}
+
+.complexity-box .cb {
+  font-weight: bold;
+  color: #e65100;
+}
+
+.complexity-box .cg {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.complexity-box hr {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 5px 0;
+}
+
+/* comparison table */
+.cmp-table-wrap {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: none;
+}
+
+.cmp-table-wrap.show {
+  display: block;
+}
+
+.cmp-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cmp-table-wrap th {
+  background: #f5f5f5;
+  padding: 5px 8px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #666;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cmp-table-wrap td {
+  padding: 4px 8px;
+  font-size: 10px;
+  font-family: monospace;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+.cmp-table-wrap tr:last-child td {
+  border-bottom: none;
+}
+
+.td-d {
+  color: #1565c0;
+  font-weight: bold;
+}
+
+.td-a {
+  color: #6a1b9a;
+  font-weight: bold;
+}
+
+.td-b {
+  color: #e65100;
+  font-weight: bold;
+}
+
+.td-win {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+/* winner badge */
+.winner-badge {
+  background: #e8f5e9;
+  border: 2px solid #2e7d32;
+  border-radius: 10px;
+  padding: 8px 14px;
+  text-align: center;
+  display: none;
+}
+
+.winner-badge.show {
+  display: block;
+}
+
+.wt {
+  font-size: 12px;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.ws {
+  font-size: 9px;
+  color: #555;
+  margin-top: 2px;
+  font-family: monospace;
+}
+
+/* evaluasi box */
+#eval-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 11px 14px;
+  display: none;
+}
+
+.eval-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.eval-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 10px;
+  color: #444;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.eval-row:last-of-type {
+  border-bottom: none;
+}
+
+.eval-algo {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: bold;
+  color: white;
+  margin-top: 1px;
+}
+
+.eval-algo.dijkstra {
+  background: #1565c0;
+}
+
+.eval-algo.astar {
+  background: #6a1b9a;
+}
+
+.eval-algo.bfs {
+  background: #e65100;
+}
+
+.eval-note {
+  font-size: 9px;
+  color: #777;
+  line-height: 1.5;
+}
+
+.eval-conclusion {
+  margin-top: 7px;
+  padding: 7px 10px;
+  background: #f1f8e9;
+  border-radius: 8px;
+  font-size: 10px;
+  color: #2e7d32;
+  line-height: 1.5;
+}
+
+/* log */
+.log-box {
+  background: #1a1a2e;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+}
+
+.log-head {
+  padding: 6px 12px;
+  background: #16213e;
+  font-size: 9px;
+  color: #64748b;
+  font-family: monospace;
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: 1px;
+}
+
+.log-clr {
+  cursor: pointer;
+  color: #64748b;
+  transition: color .2s;
+}
+
+.log-clr:hover {
+  color: #ef4444;
+}
+
+.log-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 7px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-family: monospace;
+  font-size: 8px;
+}
+
+.log-body::-webkit-scrollbar {
+  width: 3px;
+}
+
+.log-body::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+.ll {
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+
+.ll.inf {
+  color: #64748b;
+}
+
+.ll.dijk {
+  color: #60a5fa;
+}
+
+.ll.astr {
+  color: #c084fc;
+}
+
+.ll.bfslog {
+  color: #fb923c;
+}
+
+.ll.ok {
+  color: #4ade80;
+  background: rgba(74, 222, 128, .05);
+}
+
+.ll.warn {
+  color: #fb923c;
+}
+
+.ll.sep {
+  color: #1e3a5f;
+  margin: 2px 0;
+}
