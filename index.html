@@ -4,46 +4,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SmartRoute — Simulasi Kurir Cerdas | PAA 2026 UMRAH</title>
+  <title>SmartRoute — Simulasi Rute</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
   <div id="left-col">
-    <h1>SmartRoute — Simulasi Kurir Cerdas</h1>
-    <p style="margin-bottom:10px;color:#555;font-size:13px;text-align:center;max-width:1000px;">
-      🚚 Simulasi <b>Smart Courier</b> — Kurir mengantarkan paket dari titik asal ke tujuan
-      melalui jalur terpendek yang ditemukan oleh algoritma <b>BFS · Dijkstra · A*</b>.
-      Peta, asal &amp; tujuan dapat diacak untuk mencegah hardcoding rute.
-    </p>
+    <h1>SmartRoute — Simulasi Rute</h1>
 
-    <!-- Panel kontrol -->
     <div class="panel">
-      <label>📍 Asal:</label>
+      <label>Start:</label>
       <select id="start"></select>
-      <label>🏁 Tujuan:</label>
+      <label>Tujuan:</label>
       <select id="end"></select>
-      <button id="run-btn" onclick="startSimulation()">▶ Antar Paket</button>
+      <button id="run-btn" onclick="startSimulation()">▶ Cari Rute Terbaik</button>
       <button class="danger-btn" onclick="generateBrokenRoads()">⚡ Jalan Rusak</button>
       <button class="reset-btn" onclick="resetRoads()">↺ Reset Jalan</button>
       <button class="random-btn" onclick="randomizeMap()">🎲 Acak Peta</button>
       <label style="font-size:12px;">Kecepatan:</label>
       <input type="range" id="speed-range" min="1" max="10" value="5" style="width:80px;"
-        oninput="SPEED=+this.value; document.getElementById('speed-val').textContent=this.value+'×'" />
+        oninput="SPEED=+this.value;document.getElementById('speed-val').textContent=this.value+'×'" />
       <span id="speed-val" style="font-size:12px;font-family:monospace;min-width:22px;">5×</span>
     </div>
 
-    <!-- SVG Map -->
     <div id="svg-wrap">
       <div id="step-ctr"></div>
-
       <svg id="map" width="1000" height="650">
 
-        <!-- Dekorasi: pohon & gedung (tidak di atas jalan) -->
+        <!-- dekorasi (pohon, gedung) -->
         <g id="deco-layer"></g>
 
-        <!-- Lapisan jalan: shadow + aspal + marka -->
+        <!-- lapisan jalan -->
         <path id="road-layer-1" stroke="#555" stroke-width="44" fill="none" stroke-linecap="round"
           stroke-linejoin="round" />
         <path id="road-layer-2" stroke="#888" stroke-width="38" fill="none" stroke-linecap="round"
@@ -51,15 +43,15 @@
         <path id="road-layer-3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"
           stroke-linejoin="round" stroke-dasharray="18 18" opacity="0.6" />
 
-        <!-- Visited overlays: BFS (oranye), Dijkstra (biru), A* (ungu) -->
+        <!-- visited overlays -->
         <g id="visited-bfs-layer"></g>
         <g id="visited-d-layer"></g>
         <g id="visited-a-layer"></g>
 
-        <!-- Label nilai step-by-step di atas node (dist= / f= / hop=) -->
+        <!-- label nilai node (step-by-step) -->
         <g id="node-labels-layer"></g>
 
-        <!-- Jalur hasil algoritma -->
+        <!-- jalur hasil algoritma -->
         <path id="path-bfs" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"
           stroke-dasharray="10 6" opacity="0" />
         <path id="path-dijkstra" stroke="#1565c0" stroke-width="6" fill="none" stroke-linecap="round"
@@ -67,27 +59,27 @@
         <path id="path-astar" stroke="#6a1b9a" stroke-width="6" fill="none" stroke-linecap="round"
           stroke-linejoin="round" stroke-dasharray="16 8" opacity="0" />
 
-        <!-- Jalan rusak -->
+        <!-- jalan rusak -->
         <g id="broken-roads-layer"></g>
 
-        <!-- Highlight merah rute aktif mobil -->
+        <!-- highlight merah (dari original) -->
         <path id="highlight-path" stroke="#e53935" stroke-width="6" fill="none" stroke-linecap="round"
           stroke-linejoin="round" opacity="0" />
 
-        <!-- Bobot edge -->
+        <!-- bobot -->
         <g id="weight-labels-layer"></g>
 
-        <!-- Node & label -->
+        <!-- nodes -->
         <g id="nodes-group"></g>
 
-        <!-- Bendera KUNING = source (sesuai RPM) -->
+        <!-- flag kuning = source (sesuai RPM) -->
         <g id="flag-start" opacity="0">
           <line x1="0" y1="0" x2="0" y2="-32" stroke="#ffd600" stroke-width="3" />
           <polygon points="0,-32 18,-24 0,-16" fill="#ffd600" />
           <circle cx="0" cy="0" r="4" fill="#ffd600" />
         </g>
 
-        <!-- Bendera MERAH = destination (sesuai RPM) -->
+        <!-- flag merah = destination (sesuai RPM) -->
         <g id="flag-end" opacity="0">
           <line x1="0" y1="0" x2="0" y2="-32" stroke="#e53935" stroke-width="3" />
           <polygon points="0,-32 18,-24 0,-16" fill="#e53935" />
@@ -95,21 +87,19 @@
         </g>
 
         <!--
-        MOBIL — dipisah menjadi 2 elemen untuk fix muter-muter:
+        CAR — dipisah menjadi 2 elemen:
 
-        car-body:
-          - ikut animateMotion + rotate="auto"
-          - hanya bodi, jendela, lampu
-          - TIDAK ada roda (agar tidak konflik dengan wheel spin)
+        1. car-body  → ikut animateMotion + rotate="auto"
+                        hanya bodi + jendela + lampu
+                        TIDAK ada roda di sini
 
-        car-wheels:
-          - TIDAK pakai animateMotion
-          - posisi di-update manual via requestAnimationFrame
-          - roda spin via CSS @keyframes (toggle saat bergerak saja)
+        2. car-wheels → posisi di-update manual via requestAnimationFrame
+                         roda berputar dengan CSS, TIDAK ikut rotate path
+                         sehingga tidak "muter-muter"
       -->
 
         <!-- BODI MOBIL -->
-        <g id="car-body" opacity="0">
+        <g id="car-body" opacity="1">
           <ellipse cx="0" cy="4" rx="13" ry="5" fill="rgba(0,0,0,0.3)" />
           <rect x="-14" y="-9" width="28" height="15" fill="#e53935" rx="4" />
           <rect x="-11" y="-8" width="10" height="8" fill="#b3c8e8" rx="2" opacity="0.85" />
@@ -118,8 +108,9 @@
           <circle cx="9" cy="-10" r="2" fill="#fff9c4" opacity="0.9" />
         </g>
 
-        <!-- RODA MOBIL (posisi manual, spin CSS) -->
+        <!-- RODA MOBIL — berputar CSS, posisi di-update manual -->
         <g id="car-wheels" opacity="0">
+          <!-- roda kiri -->
           <g transform="translate(-7,6)">
             <circle cx="0" cy="0" r="4.5" fill="#111" />
             <g class="wheel-inner">
@@ -127,6 +118,7 @@
               <line x1="0" y1="-3" x2="0" y2="3" stroke="white" stroke-width="1.2" />
             </g>
           </g>
+          <!-- roda kanan -->
           <g transform="translate(7,6)">
             <circle cx="0" cy="0" r="4.5" fill="#111" />
             <g class="wheel-inner">
@@ -139,41 +131,31 @@
       </svg>
     </div>
 
-    <!-- Result box -->
-    <div id="result">📦 Pilih titik pengiriman lalu klik <b>▶ Antar Paket</b>.</div>
+    <div id="result">Pilih rute lalu klik <b>▶ Cari Rute Terbaik</b>.</div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════════
      PANEL KANAN
-     ══════════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════ -->
   <div id="right-panel">
 
     <!-- Dijkstra card -->
     <div class="algo-card" id="card-d">
-      <div class="algo-card-head dijkstra">
-        ◈ Dijkstra <span class="badge">Greedy · O((V+E) log V)</span>
-      </div>
+      <div class="algo-card-head dijkstra">◈ Dijkstra <span class="badge">O((V+E)logV)</span></div>
       <div class="algo-card-body">
-        <div class="metric-row">
-          <span class="metric-label">Jarak</span>
-          <span class="metric-val" id="d-dist">—</span>
+        <div class="metric-row"><span class="metric-label">Jarak</span> <span class="metric-val" id="d-dist">—</span>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Waktu Eksekusi</span>
-          <span class="metric-val" id="d-time">—</span>
+        <div class="metric-row"><span class="metric-label">Waktu</span> <span class="metric-val" id="d-time">—</span>
         </div>
         <div class="metric-bar-wrap">
           <div class="metric-bar d" id="bar-d-time"></div>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Node Dikunjungi</span>
-          <span class="metric-val" id="d-nodes">—</span>
-        </div>
+        <div class="metric-row"><span class="metric-label">Node dikunjungi</span><span class="metric-val"
+            id="d-nodes">—</span></div>
         <div class="metric-bar-wrap">
           <div class="metric-bar d" id="bar-d-nodes"></div>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Rute</span>
+        <div class="metric-row"><span class="metric-label">Rute</span>
           <span class="metric-val" id="d-path"
             style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
         </div>
@@ -182,30 +164,21 @@
 
     <!-- A* card -->
     <div class="algo-card" id="card-a">
-      <div class="algo-card-head astar">
-        ◈ A-Star <span class="badge">O(E log V)</span>
-      </div>
+      <div class="algo-card-head astar">◈ A-Star <span class="badge">O(E log V)</span></div>
       <div class="algo-card-body">
-        <div class="metric-row">
-          <span class="metric-label">Jarak</span>
-          <span class="metric-val" id="a-dist">—</span>
+        <div class="metric-row"><span class="metric-label">Jarak</span> <span class="metric-val" id="a-dist">—</span>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Waktu Eksekusi</span>
-          <span class="metric-val" id="a-time">—</span>
+        <div class="metric-row"><span class="metric-label">Waktu</span> <span class="metric-val" id="a-time">—</span>
         </div>
         <div class="metric-bar-wrap">
           <div class="metric-bar a" id="bar-a-time"></div>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Node Dikunjungi</span>
-          <span class="metric-val" id="a-nodes">—</span>
-        </div>
+        <div class="metric-row"><span class="metric-label">Node dikunjungi</span><span class="metric-val"
+            id="a-nodes">—</span></div>
         <div class="metric-bar-wrap">
           <div class="metric-bar a" id="bar-a-nodes"></div>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Rute</span>
+        <div class="metric-row"><span class="metric-label">Rute</span>
           <span class="metric-val" id="a-path"
             style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
         </div>
@@ -214,30 +187,21 @@
 
     <!-- BFS card (baseline) -->
     <div class="algo-card" id="card-b">
-      <div class="algo-card-head bfs">
-        ◈ BFS <span class="badge">O(V+E) · baseline</span>
-      </div>
+      <div class="algo-card-head bfs">◈ BFS <span class="badge">O(V+E) · baseline</span></div>
       <div class="algo-card-body">
-        <div class="metric-row">
-          <span class="metric-label">Jarak</span>
-          <span class="metric-val" id="b-dist">—</span>
+        <div class="metric-row"><span class="metric-label">Jarak</span> <span class="metric-val" id="b-dist">—</span>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Waktu Eksekusi</span>
-          <span class="metric-val" id="b-time">—</span>
+        <div class="metric-row"><span class="metric-label">Waktu</span> <span class="metric-val" id="b-time">—</span>
         </div>
         <div class="metric-bar-wrap">
           <div class="metric-bar b" id="bar-b-time"></div>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Node Dikunjungi</span>
-          <span class="metric-val" id="b-nodes">—</span>
-        </div>
+        <div class="metric-row"><span class="metric-label">Node dikunjungi</span><span class="metric-val"
+            id="b-nodes">—</span></div>
         <div class="metric-bar-wrap">
           <div class="metric-bar b" id="bar-b-nodes"></div>
         </div>
-        <div class="metric-row">
-          <span class="metric-label">Rute</span>
+        <div class="metric-row"><span class="metric-label">Rute</span>
           <span class="metric-val" id="b-path"
             style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
         </div>
@@ -248,64 +212,41 @@
     <div class="complexity-box">
       <div class="ct">// KOMPLEKSITAS WAKTU</div>
       <hr />
-      <span class="ct">Dijkstra</span> — Strategi: <b class="ct">Greedy</b> · Min-Heap<br />
+      <span class="ct">Dijkstra</span> — Min-Heap Binary<br />
       T = <b class="ct">O((V+E) log V)</b> &nbsp; S = O(V)<br />
       ✅ Optimal untuk bobot ≥ 0<br />
       <hr />
-      <span class="ca">A* (A-Star)</span> — f(n) = g(n) + h(n)<br />
-      h(n) = Euclidean × 0.40 <span class="cg">[admissible]</span><br />
+      <span class="ca">A* (A-Star)</span> — f(n)=g(n)+h(n)<br />
+      h(n) = Euclidean×0.40 <span class="cg">[admissible]</span><br />
       T = <b class="ca">O(E log V)</b> avg &nbsp; S = O(V)<br />
       ✅ h admissible → A* optimal<br />
       <hr />
-      <span class="cb">BFS</span> — Queue FIFO<br />
+      <span class="cb">BFS</span> — Queue (FIFO)<br />
       T = <b class="cb">O(V+E)</b> &nbsp; S = O(V)<br />
       ❌ Abaikan bobot → bukan terpendek
     </div>
 
-    <!-- Analisis Amortisasi & Recurrence (materi PAA) -->
+    <!-- Analisis Amortisasi & Recurrence (materi PAA Mg 4-5) -->
     <div class="complexity-box" id="extra-analysis">
       <div class="ct">// ANALISIS LANJUTAN</div>
-      <hr />
-      <b style="color:#c62828;">Strategi Greedy (Dijkstra)</b><br />
-      Tiap langkah pilih node dengan dist terkecil.<br />
-      Keputusan lokal optimal → solusi global optimal.<br />
-      Berlaku karena semua bobot ≥ 0 (non-negatif).<br />
       <hr />
       <b style="color:#388e3c;">Analisis Amortisasi</b><br />
       Min-Heap push/pop: O(log n) worst case<br />
       Amortized per operasi: <b style="color:#388e3c;">O(log n)</b><br />
-      Total n operasi heap: O(n log n)<br />
+      Total n operasi: O(n log n)<br />
       <hr />
       <b style="color:#0288d1;">Recurrence Equation</b><br />
-      Dijkstra T(V,E):<br />
-      <span style="font-size:9px;font-family:monospace;">
-        = V · O(log V) + E · O(log V)<br />
-        = <b style="color:#0288d1;">O((V+E) log V)</b>
-      </span><br />
+      Dijkstra via T(n):<br />
+      <span style="font-family:monospace;font-size:9px;">T(V,E) = V·O(log V) + E·O(log V)</span><br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b style="color:#0288d1;">O((V+E) log V)</b><br />
       <hr />
-      <b style="color:#7b1fa2;">Time &amp; Space Summary</b><br />
-      BFS &nbsp;&nbsp;&nbsp; T=O(V+E) &nbsp;&nbsp; S=O(V)<br />
+      <b style="color:#7b1fa2;">Time & Space Complexity</b><br />
+      BFS &nbsp;&nbsp; T=O(V+E) &nbsp; S=O(V)<br />
       Dijkstra T=O((V+E)logV) S=O(V)<br />
-      A* &nbsp;&nbsp;&nbsp;&nbsp; T=O(E logV) &nbsp;S=O(V)<br />
-      <hr />
-      <b style="color:#bf360c;">Brute Force (tidak dipakai)</b><br />
-      Coba semua kemungkinan jalur.<br />
-      T=O(V!) — tidak efisien untuk graf besar.<br />
-      Dijkstra jauh lebih optimal.<br />
-      <hr />
-      <b style="color:#1565c0;">Dynamic Programming (tidak dipakai)</b><br />
-      DP cocok untuk masalah overlapping subproblem.<br />
-      Shortest path sudah optimal dengan Dijkstra/A*.<br />
-      DP (Bellman-Ford) dipakai jika bobot negatif.<br />
-      <hr />
-      <b style="color:#4a148c;">Theory of Complexity</b><br />
-      Shortest path ∈ <b>P</b> (polynomial time).<br />
-      Dijkstra O((V+E)logV) — solvable efisien.<br />
-      TSP (semua kota) ∈ <b>NP-Hard</b> — berbeda.<br />
-      Masalah ini: P ✅ bukan NP-Hard.
+      A* &nbsp;&nbsp;&nbsp; T=O(E logV) &nbsp;S=O(V)
     </div>
 
-    <!-- Tabel perbandingan -->
+    <!-- Comparison table -->
     <div class="cmp-table-wrap" id="cmp-table">
       <table>
         <tr>
@@ -319,7 +260,7 @@
       </table>
     </div>
 
-    <!-- Winner badge -->
+    <!-- Winner -->
     <div class="winner-badge" id="winner-badge">
       <div class="wt" id="winner-title"></div>
       <div class="ws" id="winner-sub"></div>
@@ -328,19 +269,19 @@
     <!-- Evaluasi algoritma -->
     <div id="eval-box"></div>
 
-    <!-- Execution log -->
+    <!-- Log -->
     <div class="log-box">
       <div class="log-head">
         <span>// EXECUTION LOG</span>
         <span class="log-clr" onclick="clearLog()">✕ clear</span>
       </div>
       <div class="log-body" id="log-body">
-        <div class="ll inf">📦 Pilih titik asal &amp; tujuan pengiriman → klik ▶ Antar Paket.</div>
+        <div class="ll inf">Pilih titik awal &amp; tujuan → klik ▶ Cari Rute Terbaik.</div>
         <div class="ll inf">Klik 🎲 Acak Peta untuk mengacak peta, start &amp; end.</div>
       </div>
     </div>
 
-  </div><!-- /right-panel -->
+  </div>
 
   <script src="main.js"></script>
 </body>

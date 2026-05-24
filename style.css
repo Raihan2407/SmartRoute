@@ -120,8 +120,7 @@ svg#map {
   stroke-linecap: round;
 }
 
-/* ── CAR WHEELS — hanya roda yang spin, BUKAN body ── */
-/* wheel-spin di-toggle via JS classList saat moveCar saja */
+/* ── CAR WHEELS — spin hanya roda, tidak ikut rotate path ── */
 .wheel-inner {
   transform-origin: 0px 0px;
 }
@@ -132,11 +131,11 @@ svg#map {
 
 @keyframes spinning {
   from {
-    transform: rotate(0deg);
+    transform: rotate(0deg)
   }
 
   to {
-    transform: rotate(360deg);
+    transform: rotate(360deg)
   }
 }
 
@@ -176,7 +175,7 @@ svg#map {
   min-width: 400px;
 }
 
-/* ── STEP COUNTER overlay di atas SVG ── */
+/* ── STEP COUNTER ── */
 #svg-wrap {
   position: relative;
 }
@@ -193,7 +192,6 @@ svg#map {
   padding: 4px 12px;
   border-radius: 6px;
   pointer-events: none;
-  z-index: 10;
 }
 
 /* ── LEFT COLUMN ── */
@@ -204,14 +202,14 @@ svg#map {
   flex-shrink: 0;
 }
 
-/* ══════════════════════════════════════════
+/* ══════════════════════════════════════════════════════
    PANEL KANAN
-   ══════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════ */
 #right-panel {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 305px;
+  min-width: 300px;
   max-width: 340px;
   align-self: flex-start;
 }
@@ -319,7 +317,7 @@ svg#map {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 11px 14px;
   font-size: 10px;
-  line-height: 1.75;
+  line-height: 1.7;
   color: #444;
   font-family: monospace;
 }
