@@ -1,1455 +1,2050 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartRoute — Simulasi Rute</title>
-  <style>/* ══════════════════════════════════════════════════════
-   SmartRoute — style.css
-   PAA 2026 · UMRAH · Teknik Informatika
-   ══════════════════════════════════════════════════════ */
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartRoute — Simulasi Kurir Cerdas | PAA 2026 UMRAH</title>
+  <style>
+    /* SmartRoute — style.css | PAA 2026 · UMRAH */
 
-/* ── BASE (dari original, dipertahankan) ── */
-body {
-  margin: 0;
-  background: #dfefff;
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 20px;
-  gap: 20px;
-}
+    /* ── BASE ── */
+    body {
+      margin: 0;
+      background: #dfefff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      padding: 20px;
+      gap: 20px;
+    }
 
-h1 {
-  margin-bottom: 10px;
-  color: #333;
-}
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
 
-.panel {
-  margin-bottom: 15px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-  background: white;
-  padding: 15px 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
+    .panel {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-select, button {
-  padding: 8px 12px;
-  font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
+    select,
+    button {
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
 
-button {
-  cursor: pointer;
-  background-color: #1565c0;
-  color: white;
-  font-weight: bold;
-  border: none;
-  transition: background 0.2s;
-}
-button:hover        { background-color: #0d47a1; }
-button:disabled     { opacity: .5; cursor: not-allowed; }
+    button {
+      cursor: pointer;
+      background-color: #1565c0;
+      color: white;
+      font-weight: bold;
+      border: none;
+      transition: background 0.2s;
+    }
 
-.danger-btn         { background: #d32f2f; }
-.danger-btn:hover   { background: #9a0007; }
-.reset-btn          { background: #2e7d32; }
-.reset-btn:hover    { background: #1b5e20; }
-.random-btn         { background: #6a1b9a; }
-.random-btn:hover   { background: #4a148c; }
+    button:hover {
+      background-color: #0d47a1;
+    }
 
-/* ── MAP SVG (dari original, dipertahankan) ── */
-svg#map {
-  background: #7bb565;        /* hijau natural seperti original */
-  border: 4px solid #333;
-  border-radius: 12px;
-  box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
-  flex-shrink: 0;
-}
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
 
-/* ── NODE (dari original) ── */
-.node {
-  fill: #fff;
-  stroke: #1565c0;
-  stroke-width: 4;
-}
+    .danger-btn {
+      background: #d32f2f;
+    }
 
-.label-text {
-  font-size: 13px;
-  font-weight: bold;
-  fill: #222;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none;
-}
+    .danger-btn:hover {
+      background: #9a0007;
+    }
 
-/* ── CAR WHEEL SPIN (dari original, dipertahankan) ── */
-.wheel { transform-origin: 0px 0px; }
-.spin .wheel { animation: spinning 0.5s linear infinite; }
+    .reset-btn {
+      background: #2e7d32;
+    }
 
-@keyframes spinning {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
+    .reset-btn:hover {
+      background: #1b5e20;
+    }
 
-/* ── NODE POP ANIMATION (dari original, dipertahankan) ── */
-@keyframes nodePop {
-  0%   { opacity: 0; transform: scale(0); }
-  70%  { transform: scale(1.3); }
-  100% { opacity: 1; transform: scale(1); }
-}
-.node-anim {
-  animation: nodePop 0.35s ease forwards;
-  transform-box: fill-box;
-  transform-origin: center;
-}
+    .random-btn {
+      background: #6a1b9a;
+    }
 
-/* ── RESULT BOX (dari original) ── */
-#result {
-  margin-top: 15px;
-  font-size: 16px;
-  font-weight: bold;
-  background: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
-  text-align: center;
-  min-width: 400px;
-}
+    .random-btn:hover {
+      background: #4a148c;
+    }
 
-/* ── BROKEN ROAD (dari original) ── */
-.broken-road {
-  stroke: #ff0000 !important;
-  stroke-width: 12;
-  stroke-dasharray: 12 12;
-  fill: none;
-  stroke-linecap: round;
-}
+    /* ── MAP ── */
+    svg#map {
+      background: #7bb565;
+      border: 4px solid #333;
+      border-radius: 12px;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+    }
 
-/* ── WEIGHT LABEL (dari original) ── */
-.weight-label {
-  font-size: 10px;
-  font-weight: bold;
-  fill: #fff;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none;
-}
+    .node {
+      fill: #fff;
+      stroke: #1565c0;
+      stroke-width: 4;
+    }
 
-/* ════════════════════════════════════════════════════════
-   IMPROVEMENT — Panel kanan analisis algoritma
-   (tambahan baru, tidak mengubah kode original)
-   ════════════════════════════════════════════════════════ */
+    .label-text {
+      font-size: 13px;
+      font-weight: bold;
+      fill: #222;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      pointer-events: none;
+    }
 
-/* Wrapper kiri: SVG + panel atas */
-#left-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-}
+    .weight-label {
+      font-size: 10px;
+      font-weight: bold;
+      fill: #fff;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      pointer-events: none;
+    }
 
-/* Panel kanan keseluruhan */
-#right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 300px;
-  max-width: 340px;
-  align-self: flex-start;
-}
+    .broken-road {
+      stroke: #ff0000 !important;
+      stroke-width: 12;
+      stroke-dasharray: 12 12;
+      fill: none;
+      stroke-linecap: round;
+    }
 
-/* Kartu algo */
-.algo-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-.algo-card-head {
-  padding: 9px 16px;
-  font-size: 13px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.algo-card-head.dijkstra { background: #1565c0; color: white; }
-.algo-card-head.astar    { background: #6a1b9a; color: white; }
-.algo-card-head .badge {
-  background: rgba(255,255,255,0.25);
-  border-radius: 10px;
-  padding: 1px 8px;
-  font-size: 10px;
-  letter-spacing: .5px;
-}
-.algo-card-body { padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+    /* ── CAR WHEELS — hanya roda yang spin, BUKAN body ── */
+    /* wheel-spin di-toggle via JS classList saat moveCar saja */
+    .wheel-inner {
+      transform-origin: 0px 0px;
+    }
 
-.metric-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-}
-.metric-label { color: #666; }
-.metric-val   { font-weight: bold; color: #222; font-family: monospace; font-size: 13px; }
-.metric-bar-wrap { width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; }
-.metric-bar { height: 100%; border-radius: 2px; width: 0%; transition: width 1s ease; }
-.metric-bar.d { background: #1565c0; }
-.metric-bar.a { background: #6a1b9a; }
+    .wheel-spin {
+      animation: spinning 0.4s linear infinite;
+    }
 
-/* Complexity info box */
-.complexity-box {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  padding: 12px 16px;
-  font-size: 11px;
-  line-height: 1.7;
-  color: #444;
-  font-family: monospace;
-}
-.complexity-box .ctitle { font-weight: bold; color: #1565c0; font-size: 12px; }
-.complexity-box .ctitle.a { color: #6a1b9a; }
-.complexity-box hr { border: none; border-top: 1px solid #e0e0e0; margin: 6px 0; }
+    @keyframes spinning {
+      from {
+        transform: rotate(0deg);
+      }
 
-/* Comparison table */
-.cmp-table-wrap {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  overflow: hidden;
-  display: none;
-}
-.cmp-table-wrap.show { display: block; }
-.cmp-table-wrap table { width: 100%; border-collapse: collapse; }
-.cmp-table-wrap th {
-  background: #f5f5f5;
-  padding: 6px 10px;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  color: #666;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-}
-.cmp-table-wrap td {
-  padding: 5px 10px;
-  font-size: 11px;
-  font-family: monospace;
-  border-bottom: 1px solid #f0f0f0;
-  color: #333;
-}
-.cmp-table-wrap tr:last-child td { border-bottom: none; }
-.td-d    { color: #1565c0; font-weight: bold; }
-.td-a    { color: #6a1b9a; font-weight: bold; }
-.td-win  { color: #2e7d32; font-weight: bold; }
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-/* Winner badge */
-.winner-badge {
-  background: #e8f5e9;
-  border: 2px solid #2e7d32;
-  border-radius: 10px;
-  padding: 8px 14px;
-  text-align: center;
-  display: none;
-}
-.winner-badge.show { display: block; }
-.winner-badge .wt  { font-size: 13px; font-weight: bold; color: #2e7d32; }
-.winner-badge .ws  { font-size: 10px; color: #555; margin-top: 2px; font-family: monospace; }
+    /* ── NODE ANIMATIONS ── */
+    @keyframes nodePop {
+      0% {
+        opacity: 0;
+        transform: scale(0);
+      }
 
-/* Execution log */
-.log-box {
-  background: #1a1a2e;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  max-height: 260px;
-}
-.log-head {
-  padding: 7px 14px;
-  background: #16213e;
-  font-size: 10px;
-  color: #64748b;
-  font-family: monospace;
-  display: flex;
-  justify-content: space-between;
-  letter-spacing: 1px;
-}
-.log-clr { cursor: pointer; color: #64748b; transition: color .2s; }
-.log-clr:hover { color: #ef4444; }
-.log-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  font-family: monospace;
-  font-size: 9px;
-}
-.log-body::-webkit-scrollbar { width: 3px; }
-.log-body::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-.ll { padding: 1px 4px; border-radius: 2px; }
-.ll.inf  { color: #64748b; }
-.ll.dijk { color: #60a5fa; }
-.ll.astr { color: #c084fc; }
-.ll.ok   { color: #4ade80; background: rgba(74,222,128,.05); }
-.ll.warn { color: #fb923c; }
-.ll.sep  { color: #1e3a5f; margin: 2px 0; }
+      70% {
+        transform: scale(1.3);
+      }
 
-/* Step counter overlay on SVG */
-#step-ctr {
-  display: none;
-  position: absolute;
-  top: 30px;
-  right: 20px;
-  background: rgba(0,0,0,.75);
-  color: #ffcc00;
-  font-family: monospace;
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  pointer-events: none;
-}
-#svg-wrap { position: relative; }
-</style>
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .node-anim {
+      animation: nodePop 0.35s ease forwards;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    /* ── RESULT BOX ── */
+    #result {
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      background: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      min-width: 400px;
+    }
+
+    /* ── STEP COUNTER overlay di atas SVG ── */
+    #svg-wrap {
+      position: relative;
+    }
+
+    #step-ctr {
+      display: none;
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: rgba(0, 0, 0, .72);
+      color: #ffcc00;
+      font-family: monospace;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ── LEFT COLUMN ── */
+    #left-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════
+   PANEL KANAN
+   ══════════════════════════════════════════ */
+    #right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 305px;
+      max-width: 340px;
+      align-self: flex-start;
+    }
+
+    /* algo cards */
+    .algo-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .algo-card.win-card {
+      box-shadow: 0 0 0 3px #2e7d32, 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .algo-card-head {
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .algo-card-head.dijkstra {
+      background: #1565c0;
+      color: white;
+    }
+
+    .algo-card-head.astar {
+      background: #6a1b9a;
+      color: white;
+    }
+
+    .algo-card-head.bfs {
+      background: #e65100;
+      color: white;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-size: 9px;
+      letter-spacing: .5px;
+    }
+
+    .algo-card-body {
+      padding: 9px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .metric-label {
+      color: #666;
+    }
+
+    .metric-val {
+      font-weight: bold;
+      color: #222;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .metric-bar-wrap {
+      width: 100%;
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .metric-bar {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 1s ease;
+    }
+
+    .metric-bar.d {
+      background: #1565c0;
+    }
+
+    .metric-bar.a {
+      background: #6a1b9a;
+    }
+
+    .metric-bar.b {
+      background: #e65100;
+    }
+
+    /* complexity box */
+    .complexity-box {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 11px 14px;
+      font-size: 10px;
+      line-height: 1.75;
+      color: #444;
+      font-family: monospace;
+    }
+
+    .complexity-box .ct {
+      font-weight: bold;
+      color: #1565c0;
+      font-size: 11px;
+    }
+
+    .complexity-box .ca {
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+
+    .complexity-box .cb {
+      font-weight: bold;
+      color: #e65100;
+    }
+
+    .complexity-box .cg {
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    .complexity-box hr {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 5px 0;
+    }
+
+    /* comparison table */
+    .cmp-table-wrap {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: none;
+    }
+
+    .cmp-table-wrap.show {
+      display: block;
+    }
+
+    .cmp-table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .cmp-table-wrap th {
+      background: #f5f5f5;
+      padding: 5px 8px;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: #666;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .cmp-table-wrap td {
+      padding: 4px 8px;
+      font-size: 10px;
+      font-family: monospace;
+      border-bottom: 1px solid #f0f0f0;
+      color: #333;
+    }
+
+    .cmp-table-wrap tr:last-child td {
+      border-bottom: none;
+    }
+
+    .td-d {
+      color: #1565c0;
+      font-weight: bold;
+    }
+
+    .td-a {
+      color: #6a1b9a;
+      font-weight: bold;
+    }
+
+    .td-b {
+      color: #e65100;
+      font-weight: bold;
+    }
+
+    .td-win {
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    /* winner badge */
+    .winner-badge {
+      background: #e8f5e9;
+      border: 2px solid #2e7d32;
+      border-radius: 10px;
+      padding: 8px 14px;
+      text-align: center;
+      display: none;
+    }
+
+    .winner-badge.show {
+      display: block;
+    }
+
+    .wt {
+      font-size: 12px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+
+    .ws {
+      font-size: 9px;
+      color: #555;
+      margin-top: 2px;
+      font-family: monospace;
+    }
+
+    /* evaluasi box */
+    #eval-box {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 11px 14px;
+      display: none;
+    }
+
+    .eval-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .eval-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 10px;
+      color: #444;
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .eval-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .eval-algo {
+      flex-shrink: 0;
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-size: 9px;
+      font-weight: bold;
+      color: white;
+      margin-top: 1px;
+    }
+
+    .eval-algo.dijkstra {
+      background: #1565c0;
+    }
+
+    .eval-algo.astar {
+      background: #6a1b9a;
+    }
+
+    .eval-algo.bfs {
+      background: #e65100;
+    }
+
+    .eval-note {
+      font-size: 9px;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    .eval-conclusion {
+      margin-top: 7px;
+      padding: 7px 10px;
+      background: #f1f8e9;
+      border-radius: 8px;
+      font-size: 10px;
+      color: #2e7d32;
+      line-height: 1.5;
+    }
+
+    /* log */
+    .log-box {
+      background: #1a1a2e;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 220px;
+    }
+
+    .log-head {
+      padding: 6px 12px;
+      background: #16213e;
+      font-size: 9px;
+      color: #64748b;
+      font-family: monospace;
+      display: flex;
+      justify-content: space-between;
+      letter-spacing: 1px;
+    }
+
+    .log-clr {
+      cursor: pointer;
+      color: #64748b;
+      transition: color .2s;
+    }
+
+    .log-clr:hover {
+      color: #ef4444;
+    }
+
+    .log-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      font-family: monospace;
+      font-size: 8px;
+    }
+
+    .log-body::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .log-body::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+
+    .ll {
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+
+    .ll.inf {
+      color: #64748b;
+    }
+
+    .ll.dijk {
+      color: #60a5fa;
+    }
+
+    .ll.astr {
+      color: #c084fc;
+    }
+
+    .ll.bfslog {
+      color: #fb923c;
+    }
+
+    .ll.ok {
+      color: #4ade80;
+      background: rgba(74, 222, 128, .05);
+    }
+
+    .ll.warn {
+      color: #fb923c;
+    }
+
+    .ll.sep {
+      color: #1e3a5f;
+      margin: 2px 0;
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="left-col">
-  <h1>SmartRoute — Simulasi Rute</h1>
+  <div id="left-col">
+    <h1>SmartRoute — Simulasi Kurir Cerdas</h1>
+    <p style="margin-bottom:10px;color:#555;font-size:13px;text-align:center;max-width:1000px;">
+      🚚 Simulasi <b>Smart Courier</b> — Kurir mengantarkan paket dari titik asal ke tujuan
+      melalui jalur terpendek yang ditemukan oleh algoritma <b>BFS · Dijkstra · A*</b>.
+      Peta, asal &amp; tujuan dapat diacak untuk mencegah hardcoding rute.
+    </p>
 
-  <!-- ── Panel kontrol (dari original, dipertahankan) ── -->
-  <div class="panel">
-    <label>Start:</label>
-    <select id="start"></select>
-    <label>Tujuan:</label>
-    <select id="end"></select>
-    <button id="run-btn" onclick="startSimulation()">Cari Rute Terbaik</button>
-    <button class="danger-btn" onclick="generateBrokenRoads()">Buat Jalan Rusak Acak</button>
-    <button class="reset-btn"  onclick="resetRoads()">Reset Jalan</button>
-    <button class="random-btn" onclick="randomizeMap()">&#127922; Acak Rute Map</button>
-    <label style="font-size:13px;">Kecepatan:</label>
-    <input type="range" id="speed-range" min="1" max="10" value="5"
-      style="width:90px;"
-      oninput="SPEED=+this.value;document.getElementById('speed-val').textContent=this.value+'×'"/>
-    <span id="speed-val" style="font-size:13px;font-family:monospace;min-width:24px;">5×</span>
+    <!-- Panel kontrol -->
+    <div class="panel">
+      <label>📍 Asal:</label>
+      <select id="start"></select>
+      <label>🏁 Tujuan:</label>
+      <select id="end"></select>
+      <button id="run-btn" onclick="startSimulation()">▶ Antar Paket</button>
+      <button class="danger-btn" onclick="generateBrokenRoads()">⚡ Jalan Rusak</button>
+      <button class="reset-btn" onclick="resetRoads()">↺ Reset Jalan</button>
+      <button class="random-btn" onclick="randomizeMap()">🎲 Acak Peta</button>
+      <label style="font-size:12px;">Kecepatan:</label>
+      <input type="range" id="speed-range" min="1" max="10" value="5" style="width:80px;"
+        oninput="SPEED=+this.value; document.getElementById('speed-val').textContent=this.value+'×'" />
+      <span id="speed-val" style="font-size:12px;font-family:monospace;min-width:22px;">5×</span>
+    </div>
+
+    <!-- SVG Map -->
+    <div id="svg-wrap">
+      <div id="step-ctr"></div>
+
+      <svg id="map" width="1000" height="650">
+
+        <!-- Dekorasi: pohon & gedung (tidak di atas jalan) -->
+        <g id="deco-layer"></g>
+
+        <!-- Lapisan jalan: shadow + aspal + marka -->
+        <path id="road-layer-1" stroke="#555" stroke-width="44" fill="none" stroke-linecap="round"
+          stroke-linejoin="round" />
+        <path id="road-layer-2" stroke="#888" stroke-width="38" fill="none" stroke-linecap="round"
+          stroke-linejoin="round" />
+        <path id="road-layer-3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"
+          stroke-linejoin="round" stroke-dasharray="18 18" opacity="0.6" />
+
+        <!-- Visited overlays: BFS (oranye), Dijkstra (biru), A* (ungu) -->
+        <g id="visited-bfs-layer"></g>
+        <g id="visited-d-layer"></g>
+        <g id="visited-a-layer"></g>
+
+        <!-- Label nilai step-by-step di atas node (dist= / f= / hop=) -->
+        <g id="node-labels-layer"></g>
+
+        <!-- Jalur hasil algoritma -->
+        <path id="path-bfs" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"
+          stroke-dasharray="10 6" opacity="0" />
+        <path id="path-dijkstra" stroke="#1565c0" stroke-width="6" fill="none" stroke-linecap="round"
+          stroke-linejoin="round" opacity="0" />
+        <path id="path-astar" stroke="#6a1b9a" stroke-width="6" fill="none" stroke-linecap="round"
+          stroke-linejoin="round" stroke-dasharray="16 8" opacity="0" />
+
+        <!-- Jalan rusak -->
+        <g id="broken-roads-layer"></g>
+
+        <!-- Highlight merah rute aktif mobil -->
+        <path id="highlight-path" stroke="#e53935" stroke-width="6" fill="none" stroke-linecap="round"
+          stroke-linejoin="round" opacity="0" />
+
+        <!-- Bobot edge -->
+        <g id="weight-labels-layer"></g>
+
+        <!-- Node & label -->
+        <g id="nodes-group"></g>
+
+        <!-- Bendera KUNING = source (sesuai RPM) -->
+        <g id="flag-start" opacity="0">
+          <line x1="0" y1="0" x2="0" y2="-32" stroke="#ffd600" stroke-width="3" />
+          <polygon points="0,-32 18,-24 0,-16" fill="#ffd600" />
+          <circle cx="0" cy="0" r="4" fill="#ffd600" />
+        </g>
+
+        <!-- Bendera MERAH = destination (sesuai RPM) -->
+        <g id="flag-end" opacity="0">
+          <line x1="0" y1="0" x2="0" y2="-32" stroke="#e53935" stroke-width="3" />
+          <polygon points="0,-32 18,-24 0,-16" fill="#e53935" />
+          <circle cx="0" cy="0" r="4" fill="#e53935" />
+        </g>
+
+        <!--
+        MOBIL — dipisah menjadi 2 elemen untuk fix muter-muter:
+
+        car-body:
+          - ikut animateMotion + rotate="auto"
+          - hanya bodi, jendela, lampu
+          - TIDAK ada roda (agar tidak konflik dengan wheel spin)
+
+        car-wheels:
+          - TIDAK pakai animateMotion
+          - posisi di-update manual via requestAnimationFrame
+          - roda spin via CSS @keyframes (toggle saat bergerak saja)
+      -->
+
+        <!-- BODI MOBIL -->
+        <g id="car-body" opacity="0">
+          <ellipse cx="0" cy="4" rx="13" ry="5" fill="rgba(0,0,0,0.3)" />
+          <rect x="-14" y="-9" width="28" height="15" fill="#e53935" rx="4" />
+          <rect x="-11" y="-8" width="10" height="8" fill="#b3c8e8" rx="2" opacity="0.85" />
+          <rect x="1" y="-8" width="10" height="8" fill="#b3c8e8" rx="2" opacity="0.85" />
+          <circle cx="-9" cy="-10" r="2" fill="#fff9c4" opacity="0.9" />
+          <circle cx="9" cy="-10" r="2" fill="#fff9c4" opacity="0.9" />
+        </g>
+
+        <!-- RODA MOBIL (posisi manual, spin CSS) -->
+        <g id="car-wheels" opacity="0">
+          <g transform="translate(-7,6)">
+            <circle cx="0" cy="0" r="4.5" fill="#111" />
+            <g class="wheel-inner">
+              <line x1="-3" y1="0" x2="3" y2="0" stroke="white" stroke-width="1.2" />
+              <line x1="0" y1="-3" x2="0" y2="3" stroke="white" stroke-width="1.2" />
+            </g>
+          </g>
+          <g transform="translate(7,6)">
+            <circle cx="0" cy="0" r="4.5" fill="#111" />
+            <g class="wheel-inner">
+              <line x1="-3" y1="0" x2="3" y2="0" stroke="white" stroke-width="1.2" />
+              <line x1="0" y1="-3" x2="0" y2="3" stroke="white" stroke-width="1.2" />
+            </g>
+          </g>
+        </g>
+
+      </svg>
+    </div>
+
+    <!-- Result box -->
+    <div id="result">📦 Pilih titik pengiriman lalu klik <b>▶ Antar Paket</b>.</div>
   </div>
 
-  <!-- ── SVG Map (dari original, dipertahankan + layer baru) ── -->
-  <div id="svg-wrap">
-    <div id="step-ctr"></div>
-    <svg id="map" width="1000" height="650">
+  <!-- ══════════════════════════════════════════════════
+     PANEL KANAN
+     ══════════════════════════════════════════════════ -->
+  <div id="right-panel">
 
-      <!-- decorations layer (pohon, gedung) -->
-      <g id="deco-layer"></g>
-
-      <!-- road base layers (dari original, dipertahankan) -->
-      <path id="road-layer-1" stroke="#555"   stroke-width="44" fill="none"
-            stroke-linecap="round" stroke-linejoin="round"/>
-      <path id="road-layer-2" stroke="#888"   stroke-width="38" fill="none"
-            stroke-linecap="round" stroke-linejoin="round"/>
-      <path id="road-layer-3" stroke="white"  stroke-width="2"  fill="none"
-            stroke-linecap="round" stroke-linejoin="round"
-            stroke-dasharray="18 18" opacity="0.6"/>
-
-      <!-- visited overlays — Dijkstra (biru) -->
-      <g id="visited-d-layer"></g>
-      <!-- visited overlays — A* (ungu) -->
-      <g id="visited-a-layer"></g>
-
-      <!-- final paths -->
-      <path id="path-dijkstra" stroke="#1565c0" stroke-width="6" fill="none"
-            stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
-      <path id="path-astar"    stroke="#6a1b9a" stroke-width="6" fill="none"
-            stroke-linecap="round" stroke-linejoin="round"
-            stroke-dasharray="16 8" opacity="0"/>
-
-      <!-- broken roads -->
-      <g id="broken-roads-layer"></g>
-
-      <!-- highlight path — merah (dari original) -->
-      <path id="highlight-path" stroke="#e53935" stroke-width="6" fill="none"
-            stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
-
-      <!-- weight labels -->
-      <g id="weight-labels-layer"></g>
-
-      <!-- nodes (dari original, dipertahankan) -->
-      <g id="nodes-group"></g>
-
-      <!-- source flag kuning (sesuai RPM) -->
-      <g id="flag-start" opacity="0">
-        <line x1="0" y1="0" x2="0" y2="-32" stroke="#ffd600" stroke-width="3"/>
-        <polygon points="0,-32 18,-24 0,-16" fill="#ffd600"/>
-        <circle cx="0" cy="0" r="4" fill="#ffd600"/>
-      </g>
-
-      <!-- dest flag merah (sesuai RPM) -->
-      <g id="flag-end" opacity="0">
-        <line x1="0" y1="0" x2="0" y2="-32" stroke="#e53935" stroke-width="3"/>
-        <polygon points="0,-32 18,-24 0,-16" fill="#e53935"/>
-        <circle cx="0" cy="0" r="4" fill="#e53935"/>
-      </g>
-
-      <!-- car (dari original, roda berputar dipertahankan) -->
-      <g id="car" opacity="1">
-        <!-- shadow -->
-        <ellipse cx="0" cy="5" rx="14" ry="6" fill="rgba(0,0,0,0.35)"/>
-        <!-- body -->
-        <rect x="-14" y="-9" width="28" height="15" fill="#e53935" rx="5"/>
-        <!-- windows -->
-        <rect x="-11" y="-8" width="10" height="8" fill="#b3c8e8" rx="2" opacity="0.85"/>
-        <rect x="1"   y="-8" width="10" height="8" fill="#b3c8e8" rx="2" opacity="0.85"/>
-        <!-- headlights -->
-        <circle cx="-9" cy="-10" r="2.5" fill="#fff9c4" opacity="0.9"/>
-        <circle cx="9"  cy="-10" r="2.5" fill="#fff9c4" opacity="0.9"/>
-        <!-- wheels (kelas wheel + spin dari original) -->
-        <circle class="wheel" cx="-8" cy="6" r="5" fill="#222"/>
-        <circle class="wheel" cx="-8" cy="6" r="2" fill="#888"/>
-        <circle class="wheel" cx="8"  cy="6" r="5" fill="#222"/>
-        <circle class="wheel" cx="8"  cy="6" r="2" fill="#888"/>
-      </g>
-
-    </svg>
-  </div><!-- /svg-wrap -->
-
-  <!-- result box (dari original, dipertahankan) -->
-  <div id="result">
-    Pilih titik awal &amp; tujuan, lalu klik <b>Cari Rute Terbaik</b>.
-  </div>
-
-</div><!-- /left-col -->
-
-<!-- ══════════════════════════════════════════════════════════
-     PANEL KANAN — Analisis Algoritma (tambahan baru)
-     ══════════════════════════════════════════════════════════ -->
-<div id="right-panel">
-
-  <!-- Dijkstra card -->
-  <div class="algo-card" id="card-d">
-    <div class="algo-card-head dijkstra">
-      ◈ Dijkstra
-      <span class="badge">O((V+E) log V)</span>
-    </div>
-    <div class="algo-card-body">
-      <div class="metric-row">
-        <span class="metric-label">Jarak Total</span>
-        <span class="metric-val" id="d-dist">—</span>
+    <!-- Dijkstra card -->
+    <div class="algo-card" id="card-d">
+      <div class="algo-card-head dijkstra">
+        ◈ Dijkstra <span class="badge">Greedy · O((V+E) log V)</span>
       </div>
-      <div class="metric-row">
-        <span class="metric-label">Waktu Eksekusi</span>
-        <span class="metric-val" id="d-time">—</span>
-      </div>
-      <div class="metric-bar-wrap">
-        <div class="metric-bar d" id="bar-d-time"></div>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Node Dikunjungi</span>
-        <span class="metric-val" id="d-nodes">—</span>
-      </div>
-      <div class="metric-bar-wrap">
-        <div class="metric-bar d" id="bar-d-nodes"></div>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Rute</span>
-        <span class="metric-val" id="d-path"
-          style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- A* card -->
-  <div class="algo-card" id="card-a">
-    <div class="algo-card-head astar">
-      ◈ A-Star &nbsp;<small style="font-size:10px;opacity:.8;">f(n)=g(n)+h(n)</small>
-      <span class="badge">O(E log V)</span>
-    </div>
-    <div class="algo-card-body">
-      <div class="metric-row">
-        <span class="metric-label">Jarak Total</span>
-        <span class="metric-val" id="a-dist">—</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Waktu Eksekusi</span>
-        <span class="metric-val" id="a-time">—</span>
-      </div>
-      <div class="metric-bar-wrap">
-        <div class="metric-bar a" id="bar-a-time"></div>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Node Dikunjungi</span>
-        <span class="metric-val" id="a-nodes">—</span>
-      </div>
-      <div class="metric-bar-wrap">
-        <div class="metric-bar a" id="bar-a-nodes"></div>
-      </div>
-      <div class="metric-row">
-        <span class="metric-label">Rute</span>
-        <span class="metric-val" id="a-path"
-          style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+      <div class="algo-card-body">
+        <div class="metric-row">
+          <span class="metric-label">Jarak</span>
+          <span class="metric-val" id="d-dist">—</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Waktu Eksekusi</span>
+          <span class="metric-val" id="d-time">—</span>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-bar d" id="bar-d-time"></div>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Node Dikunjungi</span>
+          <span class="metric-val" id="d-nodes">—</span>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-bar d" id="bar-d-nodes"></div>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Rute</span>
+          <span class="metric-val" id="d-path"
+            style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Complexity info -->
-  <div class="complexity-box">
-    <div class="ctitle">// KOMPLEKSITAS WAKTU</div>
-    <hr/>
-    <b style="color:#1565c0;">Dijkstra</b><br/>
-    Struktur: Min-Heap Binary<br/>
-    T(n) = <b style="color:#1565c0;">O((V+E) log V)</b><br/>
-    S(n) = O(V) — dist[] + prev[]<br/>
-    Garansi: optimal, bobot ≥ 0<br/>
-    <hr/>
-    <b style="color:#6a1b9a;" class="ctitle a">A* (A-Star)</b><br/>
-    f(n) = g(n) + h(n)<br/>
-    g(n) = biaya aktual dari start<br/>
-    h(n) = Euclidean × 0.40<br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[admissible → tidak overestimate]<br/>
-    T(n) = <b style="color:#6a1b9a;">O(E log V)</b> avg case<br/>
-    S(n) = O(V)<br/>
-    h admissible ⟹ A* <b style="color:#2e7d32;">optimal</b>
-  </div>
-
-  <!-- Comparison table -->
-  <div class="cmp-table-wrap" id="cmp-table">
-    <table>
-      <tr>
-        <th>Metrik</th>
-        <th style="color:#1565c0;">Dijkstra</th>
-        <th style="color:#6a1b9a;">A*</th>
-        <th style="color:#2e7d32;">Lebih Baik</th>
-      </tr>
-      <tbody id="cmp-tbody"></tbody>
-    </table>
-  </div>
-
-  <!-- Winner badge -->
-  <div class="winner-badge" id="winner-badge">
-    <div class="wt" id="winner-title"></div>
-    <div class="ws" id="winner-sub"></div>
-  </div>
-
-  <!-- Execution log -->
-  <div class="log-box">
-    <div class="log-head">
-      <span>// EXECUTION LOG</span>
-      <span class="log-clr" onclick="clearLog()">✕ clear</span>
+    <!-- A* card -->
+    <div class="algo-card" id="card-a">
+      <div class="algo-card-head astar">
+        ◈ A-Star <span class="badge">O(E log V)</span>
+      </div>
+      <div class="algo-card-body">
+        <div class="metric-row">
+          <span class="metric-label">Jarak</span>
+          <span class="metric-val" id="a-dist">—</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Waktu Eksekusi</span>
+          <span class="metric-val" id="a-time">—</span>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-bar a" id="bar-a-time"></div>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Node Dikunjungi</span>
+          <span class="metric-val" id="a-nodes">—</span>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-bar a" id="bar-a-nodes"></div>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Rute</span>
+          <span class="metric-val" id="a-path"
+            style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+        </div>
+      </div>
     </div>
-    <div class="log-body" id="log-body">
-      <div class="ll inf">Pilih titik awal &amp; tujuan, lalu klik Cari Rute Terbaik.</div>
-      <div class="ll inf">Klik 🎲 Acak Rute Map untuk mengacak peta, start &amp; end.</div>
+
+    <!-- BFS card (baseline) -->
+    <div class="algo-card" id="card-b">
+      <div class="algo-card-head bfs">
+        ◈ BFS <span class="badge">O(V+E) · baseline</span>
+      </div>
+      <div class="algo-card-body">
+        <div class="metric-row">
+          <span class="metric-label">Jarak</span>
+          <span class="metric-val" id="b-dist">—</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Waktu Eksekusi</span>
+          <span class="metric-val" id="b-time">—</span>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-bar b" id="bar-b-time"></div>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Node Dikunjungi</span>
+          <span class="metric-val" id="b-nodes">—</span>
+        </div>
+        <div class="metric-bar-wrap">
+          <div class="metric-bar b" id="bar-b-nodes"></div>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Rute</span>
+          <span class="metric-val" id="b-path"
+            style="font-size:9px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
+        </div>
+      </div>
     </div>
-  </div>
 
-</div><!-- /right-panel -->
+    <!-- Complexity info -->
+    <div class="complexity-box">
+      <div class="ct">// KOMPLEKSITAS WAKTU</div>
+      <hr />
+      <span class="ct">Dijkstra</span> — Strategi: <b class="ct">Greedy</b> · Min-Heap<br />
+      T = <b class="ct">O((V+E) log V)</b> &nbsp; S = O(V)<br />
+      ✅ Optimal untuk bobot ≥ 0<br />
+      <hr />
+      <span class="ca">A* (A-Star)</span> — f(n) = g(n) + h(n)<br />
+      h(n) = Euclidean × 0.40 <span class="cg">[admissible]</span><br />
+      T = <b class="ca">O(E log V)</b> avg &nbsp; S = O(V)<br />
+      ✅ h admissible → A* optimal<br />
+      <hr />
+      <span class="cb">BFS</span> — Queue FIFO<br />
+      T = <b class="cb">O(V+E)</b> &nbsp; S = O(V)<br />
+      ❌ Abaikan bobot → bukan terpendek
+    </div>
 
-<script>// ══════════════════════════════════════════════════════════════
-//  SmartRoute — main.js
-//  PAA 2026 · UMRAH · Teknik Informatika
-//  Algoritma: Dijkstra + A* (A-Star)
-// ══════════════════════════════════════════════════════════════
+    <!-- Analisis Amortisasi & Recurrence (materi PAA) -->
+    <div class="complexity-box" id="extra-analysis">
+      <div class="ct">// ANALISIS LANJUTAN</div>
+      <hr />
+      <b style="color:#c62828;">Strategi Greedy (Dijkstra)</b><br />
+      Tiap langkah pilih node dengan dist terkecil.<br />
+      Keputusan lokal optimal → solusi global optimal.<br />
+      Berlaku karena semua bobot ≥ 0 (non-negatif).<br />
+      <hr />
+      <b style="color:#388e3c;">Analisis Amortisasi</b><br />
+      Min-Heap push/pop: O(log n) worst case<br />
+      Amortized per operasi: <b style="color:#388e3c;">O(log n)</b><br />
+      Total n operasi heap: O(n log n)<br />
+      <hr />
+      <b style="color:#0288d1;">Recurrence Equation</b><br />
+      Dijkstra T(V,E):<br />
+      <span style="font-size:9px;font-family:monospace;">
+        = V · O(log V) + E · O(log V)<br />
+        = <b style="color:#0288d1;">O((V+E) log V)</b>
+      </span><br />
+      <hr />
+      <b style="color:#7b1fa2;">Time &amp; Space Summary</b><br />
+      BFS &nbsp;&nbsp;&nbsp; T=O(V+E) &nbsp;&nbsp; S=O(V)<br />
+      Dijkstra T=O((V+E)logV) S=O(V)<br />
+      A* &nbsp;&nbsp;&nbsp;&nbsp; T=O(E logV) &nbsp;S=O(V)<br />
+      <hr />
+      <b style="color:#bf360c;">Brute Force (tidak dipakai)</b><br />
+      Coba semua kemungkinan jalur.<br />
+      T=O(V!) — tidak efisien untuk graf besar.<br />
+      Dijkstra jauh lebih optimal.<br />
+      <hr />
+      <b style="color:#1565c0;">Dynamic Programming (tidak dipakai)</b><br />
+      DP cocok untuk masalah overlapping subproblem.<br />
+      Shortest path sudah optimal dengan Dijkstra/A*.<br />
+      DP (Bellman-Ford) dipakai jika bobot negatif.<br />
+      <hr />
+      <b style="color:#4a148c;">Theory of Complexity</b><br />
+      Shortest path ∈ <b>P</b> (polynomial time).<br />
+      Dijkstra O((V+E)logV) — solvable efisien.<br />
+      TSP (semua kota) ∈ <b>NP-Hard</b> — berbeda.<br />
+      Masalah ini: P ✅ bukan NP-Hard.
+    </div>
 
-// ── Default graph & positions (dari original, dipertahankan) ──────────────────
-const defaultGraph = {
-  "A":[{node:"C",weight:280},{node:"B",weight:220},{node:"H",weight:300}],
-  "B":[{node:"A",weight:220},{node:"E",weight:290},{node:"D",weight:230},{node:"H",weight:150}],
-  "C":[{node:"A",weight:280},{node:"E",weight:260},{node:"F",weight:370},{node:"I",weight:200}],
-  "D":[{node:"B",weight:230},{node:"G",weight:600},{node:"J",weight:100}],
-  "E":[{node:"B",weight:290},{node:"C",weight:260},{node:"F",weight:230},{node:"G",weight:370}],
-  "F":[{node:"C",weight:370},{node:"E",weight:230},{node:"G",weight:260},{node:"I",weight:250},{node:"K",weight:200}],
-  "G":[{node:"D",weight:600},{node:"E",weight:370},{node:"F",weight:260},{node:"K",weight:250}],
-  "H":[{node:"A",weight:300},{node:"B",weight:150}],
-  "I":[{node:"C",weight:200},{node:"F",weight:250}],
-  "J":[{node:"D",weight:100}],
-  "K":[{node:"F",weight:200},{node:"G",weight:250}]
-};
-const defaultPositions = {
-  "A":{x:500,y:30},  "B":{x:300,y:290}, "C":{x:550,y:160},
-  "D":{x:210,y:320}, "E":{x:600,y:350}, "F":{x:870,y:320},
-  "G":{x:500,y:500}, "H":{x:60,y:200},  "I":{x:750,y:100},
-  "J":{x:110,y:580}, "K":{x:970,y:580}
-};
+    <!-- Tabel perbandingan -->
+    <div class="cmp-table-wrap" id="cmp-table">
+      <table>
+        <tr>
+          <th>Metrik</th>
+          <th style="color:#1565c0;">Dijkstra</th>
+          <th style="color:#6a1b9a;">A*</th>
+          <th style="color:#e65100;">BFS</th>
+          <th style="color:#2e7d32;">Terbaik</th>
+        </tr>
+        <tbody id="cmp-tbody"></tbody>
+      </table>
+    </div>
 
-let originalGraph = JSON.parse(JSON.stringify(defaultGraph));
-let graph         = JSON.parse(JSON.stringify(defaultGraph));
-let positions     = JSON.parse(JSON.stringify(defaultPositions));
-let brokenRoads   = [];
+    <!-- Winner badge -->
+    <div class="winner-badge" id="winner-badge">
+      <div class="wt" id="winner-title"></div>
+      <div class="ws" id="winner-sub"></div>
+    </div>
 
-// ── Selects (dari original, dipertahankan) ────────────────────────────────────
-function populateSelects() {
-  const nodes = Object.keys(positions).sort();
-  const ss = document.getElementById("start");
-  const se = document.getElementById("end");
-  const pS = ss.value, pE = se.value;
-  ss.innerHTML = se.innerHTML = "";
-  nodes.forEach(n => {
-    ss.innerHTML += `<option value="${n}">${n}</option>`;
-    se.innerHTML += `<option value="${n}">${n}</option>`;
-  });
-  if (nodes.includes(pS)) ss.value = pS;
-  const fallback = nodes.find(n => n !== ss.value) || nodes[1] || nodes[0];
-  se.value = (nodes.includes(pE) && pE !== ss.value) ? pE : fallback;
-}
+    <!-- Evaluasi algoritma -->
+    <div id="eval-box"></div>
 
-// ── Bezier helpers (dari original, dipertahankan) ─────────────────────────────
-function getCurveParams(p1, p2, n1, n2) {
-  const dx = p2.x - p1.x, dy = p2.y - p1.y;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-  if (dist < 1) return null;
-  const flip = (n1.charCodeAt(0) + n2.charCodeAt(0)) % 2 === 0 ? 1 : -1;
-  const ci = Math.min(dist * 0.22, 70) * flip;
-  const nx = (-dy / dist) * ci, ny = (dx / dist) * ci;
-  return {
-    cx1: p1.x + dx*0.3 + nx, cy1: p1.y + dy*0.3 + ny,
-    cx2: p1.x + dx*0.7 - nx, cy2: p1.y + dy*0.7 - ny
-  };
-}
+    <!-- Execution log -->
+    <div class="log-box">
+      <div class="log-head">
+        <span>// EXECUTION LOG</span>
+        <span class="log-clr" onclick="clearLog()">✕ clear</span>
+      </div>
+      <div class="log-body" id="log-body">
+        <div class="ll inf">📦 Pilih titik asal &amp; tujuan pengiriman → klik ▶ Antar Paket.</div>
+        <div class="ll inf">Klik 🎲 Acak Peta untuk mengacak peta, start &amp; end.</div>
+      </div>
+    </div>
 
-function getNaturalPath(p1, p2, n1, n2) {
-  const c = getCurveParams(p1, p2, n1, n2);
-  if (!c) return `L ${p2.x} ${p2.y}`;
-  return `C ${c.cx1} ${c.cy1} ${c.cx2} ${c.cy2} ${p2.x} ${p2.y}`;
-}
+  </div><!-- /right-panel -->
 
-function bezierPoint(p1, p2, n1, n2, t) {
-  const c = getCurveParams(p1, p2, n1, n2);
-  if (!c) return { x: p1.x + (p2.x - p1.x)*t, y: p1.y + (p2.y - p1.y)*t };
-  const mt = 1 - t;
-  return {
-    x: mt*mt*mt*p1.x + 3*mt*mt*t*c.cx1 + 3*mt*t*t*c.cx2 + t*t*t*p2.x,
-    y: mt*mt*mt*p1.y + 3*mt*mt*t*c.cy1 + 3*mt*t*t*c.cy2 + t*t*t*p2.y
-  };
-}
+  <script>// ══════════════════════════════════════════════════════════════
+    //  SmartRoute — Simulasi Kurir Cerdas
+    //  PAA 2026 · UMRAH · Teknik Informatika
+    //  Algoritma Pencarian Rute: BFS (baseline) + Dijkstra + A* (A-Star)
+    //  Konteks: Kurir mengantarkan paket dari titik asal ke tujuan
+    //           melalui jalur jalan terpendek yang ditemukan algoritma
+    // ══════════════════════════════════════════════════════════════
 
-// ── Segment intersection (dari original, dipertahankan) ───────────────────────
-function segmentsIntersect(ax,ay,bx,by,cx,cy,dx,dy) {
-  const d1x=bx-ax, d1y=by-ay, d2x=dx-cx, d2y=dy-cy;
-  const cross = d1x*d2y - d1y*d2x;
-  if (Math.abs(cross) < 1e-9) return false;
-  const tx = ((cx-ax)*d2y - (cy-ay)*d2x) / cross;
-  const ty = ((cx-ax)*d1y - (cy-ay)*d1x) / cross;
-  const E = 0.04;
-  return tx>E && tx<1-E && ty>E && ty<1-E;
-}
+    // ── Default Data ──────────────────────────────────────────────
+    const defaultGraph = {
+      "A": [{ node: "C", weight: 280 }, { node: "B", weight: 220 }, { node: "H", weight: 300 }],
+      "B": [{ node: "A", weight: 220 }, { node: "E", weight: 290 }, { node: "D", weight: 230 }, { node: "H", weight: 150 }],
+      "C": [{ node: "A", weight: 280 }, { node: "E", weight: 260 }, { node: "F", weight: 370 }, { node: "I", weight: 200 }],
+      "D": [{ node: "B", weight: 230 }, { node: "G", weight: 600 }, { node: "J", weight: 100 }],
+      "E": [{ node: "B", weight: 290 }, { node: "C", weight: 260 }, { node: "F", weight: 230 }, { node: "G", weight: 370 }],
+      "F": [{ node: "C", weight: 370 }, { node: "E", weight: 230 }, { node: "G", weight: 260 }, { node: "I", weight: 250 }, { node: "K", weight: 200 }],
+      "G": [{ node: "D", weight: 600 }, { node: "E", weight: 370 }, { node: "F", weight: 260 }, { node: "K", weight: 250 }],
+      "H": [{ node: "A", weight: 300 }, { node: "B", weight: 150 }],
+      "I": [{ node: "C", weight: 200 }, { node: "F", weight: 250 }],
+      "J": [{ node: "D", weight: 100 }],
+      "K": [{ node: "F", weight: 200 }, { node: "G", weight: 250 }]
+    };
+    const defaultPositions = {
+      "A": { x: 500, y: 30 }, "B": { x: 300, y: 290 }, "C": { x: 550, y: 160 },
+      "D": { x: 210, y: 320 }, "E": { x: 600, y: 350 }, "F": { x: 870, y: 320 },
+      "G": { x: 500, y: 500 }, "H": { x: 60, y: 200 }, "I": { x: 750, y: 100 },
+      "J": { x: 110, y: 580 }, "K": { x: 970, y: 580 }
+    };
 
-function buildEdgePts(p1, p2, n1, n2, SEGS=8) {
-  const pts = [];
-  for (let i=0; i<=SEGS; i++) pts.push(bezierPoint(p1,p2,n1,n2,i/SEGS));
-  return pts;
-}
+    let originalGraph = JSON.parse(JSON.stringify(defaultGraph));
+    let graph = JSON.parse(JSON.stringify(defaultGraph));
+    let positions = JSON.parse(JSON.stringify(defaultPositions));
+    let brokenRoads = [];
+    let SPEED = 5;
+    let simRunning = false;
 
-function edgeCrosses(existingList, p1, p2, n1, n2) {
-  const newPts = buildEdgePts(p1, p2, n1, n2, 8);
-  for (const {pts, from, to} of existingList) {
-    if (from===n1||from===n2||to===n1||to===n2) continue;
-    for (let i=0; i<newPts.length-1; i++)
-      for (let j=0; j<pts.length-1; j++)
-        if (segmentsIntersect(
-          newPts[i].x,newPts[i].y,newPts[i+1].x,newPts[i+1].y,
-          pts[j].x,  pts[j].y,  pts[j+1].x,  pts[j+1].y
-        )) return true;
-  }
-  return false;
-}
+    // ── Populate selects ──────────────────────────────────────────
+    function populateSelects() {
+      const nodes = Object.keys(positions).sort();
+      ["start", "end"].forEach(id => {
+        const sel = document.getElementById(id);
+        const prev = sel.value;
+        sel.innerHTML = "";
+        nodes.forEach(n => sel.innerHTML += `<option value="${n}">${n}</option>`);
+        if (nodes.includes(prev)) sel.value = prev;
+      });
+      const s = document.getElementById("start");
+      const e = document.getElementById("end");
+      if (s.value === e.value) {
+        const fb = nodes.find(n => n !== s.value);
+        if (fb) e.value = fb;
+      }
+    }
 
-function ptSegDist(px, py, ax, ay, bx, by) {
-  const dx=bx-ax, dy=by-ay, lenSq=dx*dx+dy*dy;
-  if (lenSq < 1) return Math.hypot(px-ax, py-ay);
-  const t = Math.max(0, Math.min(1, ((px-ax)*dx+(py-ay)*dy)/lenSq));
-  return Math.hypot(px-(ax+t*dx), py-(ay+t*dy));
-}
+    // ── Bezier helpers (dari original) ───────────────────────────
+    function getCurveParams(p1, p2, n1, n2) {
+      const dx = p2.x - p1.x, dy = p2.y - p1.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 1) return null;
+      const flip = (n1.charCodeAt(0) + n2.charCodeAt(0)) % 2 === 0 ? 1 : -1;
+      const ci = Math.min(dist * 0.22, 70) * flip;
+      const nx = (-dy / dist) * ci, ny = (dx / dist) * ci;
+      return {
+        cx1: p1.x + dx * 0.3 + nx, cy1: p1.y + dy * 0.3 + ny,
+        cx2: p1.x + dx * 0.7 - nx, cy2: p1.y + dy * 0.7 - ny
+      };
+    }
 
-function pointNearEdge(px, py, pts, clearance) {
-  for (let i=0; i<pts.length-1; i++)
-    if (ptSegDist(px,py,pts[i].x,pts[i].y,pts[i+1].x,pts[i+1].y) < clearance) return true;
-  return false;
-}
+    function getNaturalPath(p1, p2, n1, n2) {
+      const c = getCurveParams(p1, p2, n1, n2);
+      if (!c) return `L ${p2.x} ${p2.y}`;
+      return `C ${c.cx1} ${c.cy1} ${c.cx2} ${c.cy2} ${p2.x} ${p2.y}`;
+    }
 
-// ── Decorations (dari original, dipertahankan) ────────────────────────────────
-function rnd(a,b){ return a+Math.random()*(b-a); }
-function ri(a,b){ return Math.floor(rnd(a,b+1)); }
+    function bezierPoint(p1, p2, n1, n2, t) {
+      const c = getCurveParams(p1, p2, n1, n2);
+      if (!c) return { x: p1.x + (p2.x - p1.x) * t, y: p1.y + (p2.y - p1.y) * t };
+      const mt = 1 - t;
+      return {
+        x: mt * mt * mt * p1.x + 3 * mt * mt * t * c.cx1 + 3 * mt * t * t * c.cx2 + t * t * t * p2.x,
+        y: mt * mt * mt * p1.y + 3 * mt * mt * t * c.cy1 + 3 * mt * t * t * c.cy2 + t * t * t * p2.y
+      };
+    }
 
-function svgTree(x, y, sc) {
-  sc = sc || 1;
-  return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${sc.toFixed(2)})">
+    // ── Anti-crossing (dari original) ────────────────────────────
+    function segmentsIntersect(ax, ay, bx, by, cx, cy, dx, dy) {
+      const d1x = bx - ax, d1y = by - ay, d2x = dx - cx, d2y = dy - cy;
+      const cross = d1x * d2y - d1y * d2x;
+      if (Math.abs(cross) < 1e-9) return false;
+      const tx = ((cx - ax) * d2y - (cy - ay) * d2x) / cross;
+      const ty = ((cx - ax) * d1y - (cy - ay) * d1x) / cross;
+      const E = 0.04;
+      return tx > E && tx < 1 - E && ty > E && ty < 1 - E;
+    }
+
+    function buildEdgePts(p1, p2, n1, n2, S = 8) {
+      const pts = [];
+      for (let i = 0; i <= S; i++) pts.push(bezierPoint(p1, p2, n1, n2, i / S));
+      return pts;
+    }
+
+    function edgeCrosses(list, p1, p2, n1, n2) {
+      const np = buildEdgePts(p1, p2, n1, n2, 8);
+      for (const { pts, from, to } of list) {
+        if (from === n1 || from === n2 || to === n1 || to === n2) continue;
+        for (let i = 0; i < np.length - 1; i++)
+          for (let j = 0; j < pts.length - 1; j++)
+            if (segmentsIntersect(
+              np[i].x, np[i].y, np[i + 1].x, np[i + 1].y,
+              pts[j].x, pts[j].y, pts[j + 1].x, pts[j + 1].y
+            )) return true;
+      }
+      return false;
+    }
+
+    function ptSegDist(px, py, ax, ay, bx, by) {
+      const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy;
+      if (l < 1) return Math.hypot(px - ax, py - ay);
+      const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l));
+      return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+    }
+
+    function pointNearEdge(px, py, pts, clearance) {
+      for (let i = 0; i < pts.length - 1; i++)
+        if (ptSegDist(px, py, pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y) < clearance)
+          return true;
+      return false;
+    }
+
+    // ── Decorations ───────────────────────────────────────────────
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+    function ri(a, b) { return Math.floor(rnd(a, b + 1)); }
+
+    function svgTree(x, y, sc) {
+      sc = sc || 1;
+      return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${sc.toFixed(2)})">
     <rect x="-2" y="3" width="4" height="9" fill="#5c4033"/>
     <circle cx="0" cy="-4" r="9" fill="#2d6a4f" opacity="0.85"/>
     <circle cx="-4" cy="-1" r="6" fill="#2d6a4f" opacity="0.75"/>
     <circle cx="4"  cy="-1" r="6" fill="#2d6a4f" opacity="0.75"/>
   </g>`;
-}
-
-function svgMountain(x, y, sc) {
-  sc = sc || 1;
-  return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${sc.toFixed(2)})">
-    <path d="M -30 20 L 0 -25 L 30 20 Z"  fill="#4d7c3d" stroke="#333" stroke-width="1.5"/>
-    <path d="M -15 20 L 18 -18 L 50 20 Z" fill="#5b8f49" stroke="#333" stroke-width="1.5"/>
-    <path d="M 0 -10 L 8 -25 L 16 -10 Z"  fill="white"  opacity="0.6"/>
-  </g>`;
-}
-
-function svgBuildings(cx, cy, count, tall) {
-  const BCOLORS = ["#94a3b8","#64748b","#cbd5e1","#aab4c8","#7f8fa6","#475569"];
-  let h = "";
-  for (let i=0; i<count; i++) {
-    const bw = ri(10,18);
-    const bh = tall ? ri(40,75) : ri(18,40);
-    const bx = cx - (count*14)/2 + i*14 + ri(-3,3);
-    const by = cy - bh;
-    const col = BCOLORS[ri(0,BCOLORS.length-1)];
-    h += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw}" height="${bh}"
-               fill="${col}" stroke="#333" stroke-width="1.2" rx="1"/>`;
-    const rows = Math.max(1, Math.floor(bh/11)-1);
-    for (let r=0; r<rows; r++) {
-      const wx = bx + bw*0.2;
-      const wy = by + 5 + r*10;
-      const lit = Math.random()>0.25;
-      h += `<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${(bw*0.6).toFixed(1)}" height="5"
-                  fill="${lit?'#fef08a':'#334155'}" opacity="0.8" rx="1"/>`;
     }
-  }
-  return h;
-}
 
-function drawDecorations(allEdgePts) {
-  const layer = document.getElementById("deco-layer");
-  layer.innerHTML = "";
-  const NODE_RADIUS = 14;
-  const SLOT_R      = NODE_RADIUS + 28;
-  const ROAD_CLEAR  = 28;
-  const SLOTS       = 16;
-  let html = "";
-  for (const name in positions) {
-    const p = positions[name];
-    const degree = (originalGraph[name] || []).length;
-    const freeAngles = [];
-    for (let i=0; i<SLOTS; i++) {
-      const ang = (i / SLOTS) * Math.PI * 2;
-      const tx  = p.x + Math.cos(ang) * SLOT_R;
-      const ty  = p.y + Math.sin(ang) * SLOT_R;
-      let clear = true;
-      for (const {pts} of allEdgePts) {
-        if (pointNearEdge(tx, ty, pts, ROAD_CLEAR)) { clear = false; break; }
+    function svgBuildings(cx, cy, cnt, tall) {
+      const C = ["#94a3b8", "#64748b", "#cbd5e1", "#aab4c8", "#7f8fa6", "#475569"];
+      let h = "";
+      for (let i = 0; i < cnt; i++) {
+        const bw = ri(10, 18), bh = tall ? ri(40, 75) : ri(18, 40);
+        const bx = cx - (cnt * 14) / 2 + i * 14 + ri(-3, 3), by = cy - bh;
+        h += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw}" height="${bh}"
+      fill="${C[ri(0, C.length - 1)]}" stroke="#333" stroke-width="1.2" rx="1"/>`;
+        const rows = Math.max(1, Math.floor(bh / 11) - 1);
+        for (let r = 0; r < rows; r++) {
+          const lit = Math.random() > 0.25;
+          h += `<rect x="${(bx + bw * 0.2).toFixed(1)}" y="${(by + 5 + r * 10).toFixed(1)}"
+        width="${(bw * 0.6).toFixed(1)}" height="5"
+        fill="${lit ? '#fef08a' : '#334155'}" opacity="0.8" rx="1"/>`;
+        }
       }
-      if (clear) freeAngles.push(ang);
+      return h;
     }
-    if (freeAngles.length === 0) continue;
-    const groups = [];
-    let cur = [freeAngles[0]];
-    for (let i=1; i<freeAngles.length; i++) {
-      if (freeAngles[i] - freeAngles[i-1] < (Math.PI*2/SLOTS)*2.1) cur.push(freeAngles[i]);
-      else { groups.push(cur); cur=[freeAngles[i]]; }
-    }
-    groups.push(cur);
-    const bigGroup = groups.sort((a,b)=>b.length-a.length)[0];
-    const midAng   = bigGroup[Math.floor(bigGroup.length/2)];
-    const dx = Math.cos(midAng), dy = Math.sin(midAng);
-    if (degree >= 4) {
-      html += svgBuildings(p.x + dx*(SLOT_R+5), p.y + dy*(SLOT_R+5), ri(4,6), true);
-      if (bigGroup.length >= 4) {
-        const angOff = bigGroup.length > 6 ? midAng + 0.4 : midAng;
-        html += svgMountain(p.x + Math.cos(angOff)*(SLOT_R+38), p.y + Math.sin(angOff)*(SLOT_R+38), 0.7);
-      }
-    } else if (degree >= 2) {
-      html += svgBuildings(p.x + dx*(SLOT_R+5), p.y + dy*(SLOT_R+5), ri(2,4), false);
-      if (bigGroup.length >= 3) {
-        const ang2 = bigGroup[1];
-        html += svgTree(p.x + Math.cos(ang2)*(SLOT_R+10), p.y + Math.sin(ang2)*(SLOT_R+10), rnd(0.7,1.1));
-      }
-    } else {
-      for (let k=0; k<Math.min(bigGroup.length, 3); k++) {
-        const a  = bigGroup[k];
-        const tr = SLOT_R + rnd(5,18);
-        html += svgTree(p.x + Math.cos(a)*tr, p.y + Math.sin(a)*tr, rnd(0.7,1.2));
-      }
-    }
-  }
-  layer.innerHTML = html;
-}
 
-// ── Draw map (dari original, dipertahankan) ───────────────────────────────────
-function buildAllEdgePts() {
-  const list = [];
-  const drawn = new Set();
-  for (let u in graph) {
-    for (let e of graph[u]) {
-      const pair = [u, e.node].sort().join("-");
-      if (!drawn.has(pair)) {
-        drawn.add(pair);
-        list.push({
-          pts:  buildEdgePts(positions[u], positions[e.node], u, e.node, 10),
-          from: u, to: e.node
+    function drawDecorations(allEdgePts) {
+      const layer = document.getElementById("deco-layer");
+      layer.innerHTML = "";
+      const SLOT_R = 42, ROAD_CLEAR = 28, SLOTS = 16;
+      let html = "";
+      for (const name in positions) {
+        const p = positions[name], deg = (originalGraph[name] || []).length, fa = [];
+        for (let i = 0; i < SLOTS; i++) {
+          const a = (i / SLOTS) * Math.PI * 2;
+          const tx = p.x + Math.cos(a) * SLOT_R, ty = p.y + Math.sin(a) * SLOT_R;
+          let clear = true;
+          for (const { pts } of allEdgePts)
+            if (pointNearEdge(tx, ty, pts, ROAD_CLEAR)) { clear = false; break; }
+          if (clear) fa.push(a);
+        }
+        if (!fa.length) continue;
+        const mid = fa[Math.floor(fa.length / 2)];
+        const dx = Math.cos(mid), dy = Math.sin(mid);
+        if (deg >= 4)
+          html += svgBuildings(p.x + dx * (SLOT_R + 5), p.y + dy * (SLOT_R + 5), ri(4, 6), true);
+        else if (deg >= 2) {
+          html += svgBuildings(p.x + dx * (SLOT_R + 5), p.y + dy * (SLOT_R + 5), ri(2, 4), false);
+          if (fa.length >= 3)
+            html += svgTree(p.x + Math.cos(fa[1]) * (SLOT_R + 10), p.y + Math.sin(fa[1]) * (SLOT_R + 10), rnd(0.7, 1.1));
+        } else {
+          fa.slice(0, 3).forEach(a =>
+            html += svgTree(p.x + Math.cos(a) * (SLOT_R + rnd(5, 18)), p.y + Math.sin(a) * (SLOT_R + rnd(5, 18)), rnd(0.7, 1.2))
+          );
+        }
+      }
+      layer.innerHTML = html;
+    }
+
+    // ── Draw Map ──────────────────────────────────────────────────
+    function buildAllEdgePts() {
+      const list = [], drawn = new Set();
+      for (const u in graph) {
+        for (const e of graph[u]) {
+          const pair = [u, e.node].sort().join("-");
+          if (!drawn.has(pair)) {
+            drawn.add(pair);
+            list.push({
+              pts: buildEdgePts(positions[u], positions[e.node], u, e.node, 10),
+              from: u, to: e.node
+            });
+          }
+        }
+      }
+      return list;
+    }
+
+    function drawMap(animate, edgePtList) {
+      const edgeList = edgePtList || buildAllEdgePts();
+      let baseD = "";
+      for (const { from, to } of edgeList)
+        baseD += `M ${positions[from].x} ${positions[from].y} ${getNaturalPath(positions[from], positions[to], from, to)} `;
+
+      ["road-layer-1", "road-layer-2", "road-layer-3"]
+        .forEach(id => document.getElementById(id).setAttribute("d", baseD));
+
+      const ng = document.getElementById("nodes-group");
+      ng.innerHTML = "";
+      for (const name in positions) {
+        const p = positions[name];
+        ng.innerHTML += `
+      <circle class="${animate ? 'node node-anim' : 'node'}" id="nc-${name}" cx="${p.x}" cy="${p.y}" r="14"/>
+      <text class="label-text" x="${p.x}" y="${p.y + 1}">${name}</text>`;
+      }
+
+      drawWeightLabels();
+      drawDecorations(edgeList);
+      resetSimVisuals();
+      updateFlags();
+      brokenRoads = [];
+    }
+
+    function drawWeightLabels() {
+      const layer = document.getElementById("weight-labels-layer");
+      layer.innerHTML = "";
+      const drawn = new Set();
+      for (const u in originalGraph) {
+        for (const e of originalGraph[u]) {
+          const pair = [u, e.node].sort().join("-");
+          if (!drawn.has(pair)) {
+            drawn.add(pair);
+            const mid = bezierPoint(positions[u], positions[e.node], u, e.node, 0.5);
+            layer.innerHTML += `
+          <rect x="${(mid.x - 17).toFixed(1)}" y="${(mid.y - 8).toFixed(1)}" width="34" height="15" rx="4" fill="#333" opacity="0.78"/>
+          <text class="weight-label" x="${mid.x.toFixed(1)}" y="${(mid.y + 0.5).toFixed(1)}">${e.weight}</text>`;
+          }
+        }
+      }
+    }
+
+    function resetSimVisuals() {
+      ["visited-d-layer", "visited-a-layer", "visited-bfs-layer",
+        "node-labels-layer", "broken-roads-layer"]
+        .forEach(id => document.getElementById(id).innerHTML = "");
+
+      ["path-dijkstra", "path-astar", "path-bfs", "highlight-path"]
+        .forEach(id => {
+          document.getElementById(id).setAttribute("d", "");
+          document.getElementById(id).setAttribute("opacity", "0");
         });
+
+      // Sembunyikan car (jangan set transform — biarkan animateMotion handle posisi)
+      document.getElementById("car-body").setAttribute("opacity", "0");
+      document.getElementById("car-wheels").setAttribute("opacity", "0");
+
+      // Hapus animasi lama agar tidak "freeze" di posisi akhir run sebelumnya
+      document.getElementById("car-anim-body")?.remove();
+
+      // Matikan wheel spin
+      document.querySelectorAll(".wheel-inner")
+        .forEach(w => w.classList.remove("wheel-spin"));
+
+      document.getElementById("step-ctr").style.display = "none";
+    }
+
+    function updateFlags() {
+      const s = document.getElementById("start").value;
+      const e = document.getElementById("end").value;
+      const fs = document.getElementById("flag-start");
+      const fe = document.getElementById("flag-end");
+      if (positions[s]) {
+        fs.setAttribute("transform", `translate(${positions[s].x},${positions[s].y})`);
+        fs.setAttribute("opacity", "1");
+      }
+      if (positions[e]) {
+        fe.setAttribute("transform", `translate(${positions[e].x},${positions[e].y})`);
+        fe.setAttribute("opacity", "1");
       }
     }
-  }
-  return list;
-}
 
-function drawMap(animate, edgePtList) {
-  const edgeList = edgePtList || buildAllEdgePts();
-  let baseD = "";
-  for (const {pts, from, to} of edgeList)
-    baseD += `M ${positions[from].x} ${positions[from].y} ${getNaturalPath(positions[from], positions[to], from, to)} `;
+    // ══════════════════════════════════════════════════════════════
+    //  MIN-HEAP (Priority Queue)
+    //  Digunakan oleh Dijkstra & A* → insert dan extractMin O(log n)
+    // ══════════════════════════════════════════════════════════════
+    class MinHeap {
+      constructor() { this.h = []; }
 
-  document.getElementById("road-layer-1").setAttribute("d", baseD);
-  document.getElementById("road-layer-2").setAttribute("d", baseD);
-  document.getElementById("road-layer-3").setAttribute("d", baseD);
+      push(item) {
+        this.h.push(item);
+        this._up(this.h.length - 1);
+      }
 
-  const ng = document.getElementById("nodes-group");
-  ng.innerHTML = "";
-  for (let name in positions) {
-    const p = positions[name];
-    ng.innerHTML += `
-      <circle class="${animate?'node node-anim':'node'}" cx="${p.x}" cy="${p.y}" r="14"/>
-      <text class="label-text" x="${p.x}" y="${p.y+1}">${name}</text>`;
-  }
+      pop() {
+        const top = this.h[0];
+        const last = this.h.pop();
+        if (this.h.length) { this.h[0] = last; this._down(0); }
+        return top;
+      }
 
-  drawWeightLabels();
-  drawDecorations(edgeList);
+      get size() { return this.h.length; }
 
-  const sp = positions[document.getElementById("start").value] || Object.values(positions)[0];
-  document.getElementById("car").setAttribute("transform", `translate(${sp.x},${sp.y})`);
-  document.getElementById("highlight-path").setAttribute("d","");
-  document.getElementById("broken-roads-layer").innerHTML = "";
+      _up(i) {
+        while (i > 0) {
+          const p = Math.floor((i - 1) / 2);
+          if (this.h[p].f <= this.h[i].f) break;
+          [this.h[p], this.h[i]] = [this.h[i], this.h[p]];
+          i = p;
+        }
+      }
 
-  // reset visited overlays & final paths
-  document.getElementById("visited-d-layer").innerHTML = "";
-  document.getElementById("visited-a-layer").innerHTML = "";
-  document.getElementById("path-dijkstra").setAttribute("d","");
-  document.getElementById("path-astar").setAttribute("d","");
-  document.getElementById("path-dijkstra").setAttribute("opacity","0");
-  document.getElementById("path-astar").setAttribute("opacity","0");
-
-  brokenRoads = [];
-
-  // posisikan flag start (kuning) & end (merah) sesuai RPM
-  updateFlags();
-}
-
-function updateFlags() {
-  const s = document.getElementById('start').value;
-  const e = document.getElementById('end').value;
-  const fs = document.getElementById('flag-start');
-  const fe = document.getElementById('flag-end');
-  if (positions[s]) {
-    fs.setAttribute('transform', `translate(${positions[s].x},${positions[s].y})`);
-    fs.setAttribute('opacity','1');
-  }
-  if (positions[e]) {
-    fe.setAttribute('transform', `translate(${positions[e].x},${positions[e].y})`);
-    fe.setAttribute('opacity','1');
-  }
-}
-
-function drawWeightLabels() {
-  const layer = document.getElementById("weight-labels-layer");
-  layer.innerHTML = "";
-  const drawn = new Set();
-  for (let u in originalGraph) {
-    for (let e of originalGraph[u]) {
-      const pair = [u, e.node].sort().join("-");
-      if (!drawn.has(pair)) {
-        drawn.add(pair);
-        const mid = bezierPoint(positions[u], positions[e.node], u, e.node, 0.5);
-        layer.innerHTML += `
-          <rect x="${(mid.x-17).toFixed(1)}" y="${(mid.y-8).toFixed(1)}" width="34" height="15"
-                rx="4" fill="#333" opacity="0.78"/>
-          <text class="weight-label" x="${mid.x.toFixed(1)}" y="${(mid.y+0.5).toFixed(1)}">${e.weight}</text>`;
+      _down(i) {
+        const n = this.h.length;
+        while (true) {
+          let m = i, l = 2 * i + 1, r = 2 * i + 2;
+          if (l < n && this.h[l].f < this.h[m].f) m = l;
+          if (r < n && this.h[r].f < this.h[m].f) m = r;
+          if (m === i) break;
+          [this.h[m], this.h[i]] = [this.h[i], this.h[m]];
+          i = m;
+        }
       }
     }
-  }
-}
 
-// ══════════════════════════════════════════════════════════════
-//  MIN-HEAP (Priority Queue)
-//  Digunakan oleh Dijkstra & A* → operasi push/pop O(log V)
-// ══════════════════════════════════════════════════════════════
-class MinHeap {
-  constructor() { this.h = []; }
-  push(item) { this.h.push(item); this._up(this.h.length - 1); }
-  pop() {
-    const top = this.h[0], last = this.h.pop();
-    if (this.h.length) { this.h[0] = last; this._down(0); }
-    return top;
-  }
-  get size() { return this.h.length; }
-  _up(i) {
-    while (i > 0) {
-      const p = Math.floor((i-1)/2);
-      if (this.h[p].f <= this.h[i].f) break;
-      [this.h[p],this.h[i]] = [this.h[i],this.h[p]]; i = p;
-    }
-  }
-  _down(i) {
-    const n = this.h.length;
-    while (true) {
-      let m=i, l=2*i+1, r=2*i+2;
-      if (l<n && this.h[l].f < this.h[m].f) m=l;
-      if (r<n && this.h[r].f < this.h[m].f) m=r;
-      if (m===i) break;
-      [this.h[m],this.h[i]] = [this.h[i],this.h[m]]; i=m;
-    }
-  }
-}
+    // ══════════════════════════════════════════════════════════════
+    //  PERBANDINGAN PENDEKATAN ALGORITMA (RPS Materi PAA)
+    //  ─────────────────────────────────────────────────────────────
+    //  Brute Force  : Coba semua jalur kemungkinan → O(V!)
+    //                 TIDAK dipakai karena sangat tidak efisien.
+    //                 Untuk 11 node: 11! = 39.916.800 kemungkinan.
+    //
+    //  Dynamic Prog : Bellman-Ford O(VE) — dipakai jika bobot negatif.
+    //                 Graf ini semua bobot positif → Dijkstra lebih optimal.
+    //
+    //  Greedy       : Dijkstra = greedy (pilih node terkecil dulu).
+    //                 Optimal karena bobot ≥ 0 (tidak ada bobot negatif).
+    //
+    //  Informed     : A* = informed search dengan heuristik Euclidean.
+    //                 Lebih efisien dari Dijkstra karena terarah ke tujuan.
+    //
+    //  Theory of Complexity:
+    //    Shortest Path ∈ P (polynomial) — bisa diselesaikan efisien.
+    //    TSP (Travelling Salesman) ∈ NP-Hard — berbeda dengan masalah ini.
+    //    Masalah ini: single-source shortest path → kelas P ✅
+    // ══════════════════════════════════════════════════════════════
 
-// ══════════════════════════════════════════════════════════════
-//  DIJKSTRA'S ALGORITHM
-//  ──────────────────────────────────────────────────────────────
-//  Kompleksitas Waktu : O((V + E) log V)
-//    V iterasi extract-min dari Min-Heap  → O(V log V)
-//    E iterasi relaksasi edge             → O(E log V)
-//  Kompleksitas Ruang : O(V) — dist[], prev[]
-//
-//  Pseudocode:
-//    dist[start] = 0; dist[v] = ∞ untuk semua v ≠ start
-//    PQ.push({start, 0})
-//    while PQ tidak kosong:
-//      u = PQ.extractMin()
-//      if u ∈ visited: skip
-//      visited.add(u)
-//      for setiap tetangga v dari u:
-//        if dist[u] + w(u,v) < dist[v]:
-//          dist[v] = dist[u] + w(u,v)
-//          prev[v] = u
-//          PQ.push({v, dist[v]})
-//    rekonstruksi path dari prev[]
-// ══════════════════════════════════════════════════════════════
-function dijkstra(g, start, end) {
-  const dist = {}, prev = {}, visited = [], order = [];
-  for (const n in g) dist[n] = Infinity;
-  dist[start] = 0;
-  const pq = new MinHeap();
-  pq.push({ f: 0, node: start });
+    // ══════════════════════════════════════════════════════════════
+    //  BFS (Breadth-First Search) — O(V+E)  [BASELINE]
+    //  ─────────────────────────────────────────────────────────────
+    //  Kompleksitas Waktu : O(V + E)
+    //  Kompleksitas Ruang : O(V)
+    //  Tidak mempertimbangkan bobot → menemukan HOP terkecil,
+    //  BUKAN rute terpendek berbobot. Dipakai sebagai BASELINE.
+    //
+    //  Pseudocode:
+    //    queue = [start]  ;  visited = {}
+    //    while queue tidak kosong:
+    //      u = queue.dequeue()          // FIFO
+    //      visited.add(u)
+    //      if u == end : selesai
+    //      for setiap tetangga v dari u:
+    //        if v ∉ visited:
+    //          prev[v] = u
+    //          queue.enqueue(v)
+    //    rekonstruksi path dari prev[]
+    // ══════════════════════════════════════════════════════════════
+    function bfs(g, start, end) {
+      const visited = [], prev = {}, order = [];
+      const queue = [start], inQ = new Set([start]);
 
-  while (pq.size > 0) {
-    const { f: d, node: u } = pq.pop();
-    if (visited.includes(u)) continue;
-    visited.push(u);
-    order.push({ node: u, dist: d, step: visited.length });
-    if (u === end) break;
-    for (const nb of g[u]) {
-      const nd = dist[u] + nb.weight;
-      if (nd < dist[nb.node]) {
-        dist[nb.node] = nd;
-        prev[nb.node] = u;
-        pq.push({ f: nd, node: nb.node });
+      while (queue.length > 0) {
+        const u = queue.shift();                  // dequeue (FIFO)
+        visited.push(u);
+        order.push({ node: u, step: visited.length });
+        if (u === end) break;
+        for (const nb of g[u]) {
+          if (!inQ.has(nb.node)) {
+            inQ.add(nb.node);
+            prev[nb.node] = u;
+            queue.push(nb.node);
+          }
+        }
       }
-    }
-  }
-  const path = []; let cur = end;
-  while (cur !== undefined) { path.unshift(cur); cur = prev[cur]; }
-  return {
-    path:    path[0] === start ? path : [],
-    distance: dist[end],
-    visited,
-    order
-  };
-}
 
-// ══════════════════════════════════════════════════════════════
-//  A* (A-STAR) ALGORITHM
-//  ──────────────────────────────────────────────────────────────
-//  Kompleksitas Waktu : O(E log V) rata-rata, jika h admissible
-//  Kompleksitas Ruang : O(V) — g[], f[], prev[]
-//
-//  Fungsi evaluasi: f(n) = g(n) + h(n)
-//    g(n) = biaya aktual dari start ke n
-//    h(n) = heuristik Euclidean × 0.40
-//           (admissible: tidak pernah overestimate biaya nyata)
-//    Admissible ⟹ A* PASTI optimal
-//
-//  Pseudocode:
-//    g[start] = 0;  f[start] = h(start, end)
-//    open.push({start, f[start]})
-//    while open tidak kosong:
-//      u = open.extractMin()   ← node dengan f terkecil
-//      if u ∈ visited: skip
-//      visited.add(u)
-//      if u == end: selesai
-//      for setiap tetangga v dari u:
-//        gNew = g[u] + w(u,v)
-//        if gNew < g[v]:
-//          g[v]    = gNew
-//          f[v]    = g[v] + h(v, end)
-//          prev[v] = u
-//          open.push({v, f[v]})
-//    rekonstruksi path dari prev[]
-// ══════════════════════════════════════════════════════════════
-function heuristic(nodeA, nodeB) {
-  const pa = positions[nodeA], pb = positions[nodeB];
-  // Euclidean distance × 0.40 — admissible scaling factor
-  return Math.hypot(pa.x - pb.x, pa.y - pb.y) * 0.40;
-}
+      // rekonstruksi path
+      const path = []; let cur = end;
+      while (cur !== undefined) { path.unshift(cur); cur = prev[cur]; }
 
-function astar(g, start, end) {
-  const gCost = {}, fCost = {}, prev = {}, visited = [], order = [];
-  for (const n in g) { gCost[n] = Infinity; fCost[n] = Infinity; }
-  gCost[start] = 0;
-  fCost[start] = heuristic(start, end);
-
-  const open = new MinHeap();
-  open.push({ f: fCost[start], node: start });
-
-  while (open.size > 0) {
-    const { node: u } = open.pop();
-    if (visited.includes(u)) continue;
-    visited.push(u);
-    order.push({
-      node: u,
-      g: gCost[u],
-      h: heuristic(u, end),
-      f: fCost[u],
-      step: visited.length
-    });
-    if (u === end) break;
-    for (const nb of g[u]) {
-      const gNew = gCost[u] + nb.weight;
-      if (gNew < gCost[nb.node]) {
-        gCost[nb.node] = gNew;
-        fCost[nb.node] = gNew + heuristic(nb.node, end);
-        prev[nb.node]  = u;
-        open.push({ f: fCost[nb.node], node: nb.node });
+      // hitung total jarak berbobot dari path yang ditemukan BFS
+      let dist = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const e = g[path[i]]?.find(x => x.node === path[i + 1]);
+        if (e) dist += e.weight;
       }
-    }
-  }
-  const path = []; let cur = end;
-  while (cur !== undefined) { path.unshift(cur); cur = prev[cur]; }
-  return {
-    path:     path[0] === start ? path : [],
-    distance: gCost[end],
-    visited,
-    order
-  };
-}
 
-// ── Car animation (dari original + rotate auto) ───────────────────────────────
-function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function moveCar(path, distance) {
-  const car = document.getElementById("car");
-  document.getElementById("car-anim")?.remove();
-  car.removeAttribute("transform");
-
-  let hd = `M ${positions[path[0]].x} ${positions[path[0]].y} `;
-  for (let i=1; i<path.length; i++)
-    hd += getNaturalPath(positions[path[i-1]], positions[path[i]], path[i-1], path[i]) + " ";
-
-  // highlight path (merah, dari original)
-  document.getElementById("highlight-path").setAttribute("d", hd);
-
-  const dur = Math.max(1.5, distance / 150);
-  const anim = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
-  anim.setAttribute("id", "car-anim");
-  anim.setAttribute("dur", `${dur}s`);
-  anim.setAttribute("fill", "freeze");
-  anim.setAttribute("rotate", "auto");  // mobil menghadap arah jalan
-  anim.setAttribute("path", hd);
-  car.appendChild(anim);
-  car.classList.add("spin");   // roda berputar (dari original)
-  anim.beginElement();
-  await wait(dur * 1000);
-  car.classList.remove("spin");
-}
-
-// ── Log helpers ───────────────────────────────────────────────────────────────
-function lg(msg, cls='inf') {
-  const b = document.getElementById("log-body");
-  const d = document.createElement("div");
-  d.className = "ll " + cls;
-  d.textContent = msg;
-  b.appendChild(d);
-  b.scrollTop = b.scrollHeight;
-}
-function lgSep() { lg("─".repeat(38), "sep"); }
-function clearLog() { document.getElementById("log-body").innerHTML = ""; }
-
-// ── Visited animation step-by-step ───────────────────────────────────────────
-const aniDelay = () => wait(Math.max(10, 200 / SPEED));
-let SPEED = 5;
-
-async function animateVisited(visitedArr, layerId, stroke, fill) {
-  const layer = document.getElementById(layerId);
-  const ctr   = document.getElementById("step-ctr");
-  ctr.style.display = "block";
-  for (let i=0; i<visitedArr.length; i++) {
-    const n = visitedArr[i], p = positions[n];
-    if (!p) continue;
-    ctr.textContent = `STEP ${i+1}/${visitedArr.length} — node ${n}`;
-    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
-    c.setAttribute("r", "20"); c.setAttribute("fill", fill);
-    c.setAttribute("stroke", stroke); c.setAttribute("stroke-width","1.5");
-    c.setAttribute("opacity",".5");
-    layer.appendChild(c);
-    await aniDelay();
-  }
-  ctr.style.display = "none";
-}
-
-function drawFinalPath(path, elId, color) {
-  if (!path || path.length < 2) return;
-  let d = `M ${positions[path[0]].x} ${positions[path[0]].y} `;
-  for (let i=1; i<path.length; i++)
-    d += getNaturalPath(positions[path[i-1]], positions[path[i]], path[i-1], path[i]) + " ";
-  const el = document.getElementById(elId);
-  el.setAttribute("d", d);
-  el.setAttribute("opacity", "1");
-}
-
-// ── Result helpers ────────────────────────────────────────────────────────────
-function resetResults() {
-  ["d-dist","d-time","d-nodes","d-path","a-dist","a-time","a-nodes","a-path"]
-    .forEach(id => { const el=document.getElementById(id); if(el) el.textContent="—"; });
-  ["bar-d-time","bar-d-nodes","bar-a-time","bar-a-nodes"]
-    .forEach(id => { const el=document.getElementById(id); if(el) el.style.width="0%"; });
-  document.getElementById("winner-badge").classList.remove("show");
-  document.getElementById("cmp-table").classList.remove("show");
-  ["card-d","card-a"].forEach(id => document.getElementById(id)?.classList.remove("win-card"));
-}
-
-function showResults(rD, rA) {
-  const maxT = Math.max(rD?.timeMs||0, rA?.timeMs||0) || 1;
-  const maxN = Math.max(rD?.visited?.length||0, rA?.visited?.length||0) || 1;
-
-  if (rD && rD.path.length > 0) {
-    document.getElementById("d-dist").textContent  = rD.distance + " km";
-    document.getElementById("d-time").textContent  = rD.timeMs + " ms";
-    document.getElementById("d-nodes").textContent = rD.visited.length + " node";
-    document.getElementById("d-path").textContent  = rD.path.join("→");
-    setTimeout(() => {
-      document.getElementById("bar-d-time").style.width  = (rD.timeMs/maxT*100).toFixed(1)+"%";
-      document.getElementById("bar-d-nodes").style.width = (rD.visited.length/maxN*100).toFixed(1)+"%";
-    }, 200);
-  }
-  if (rA && rA.path.length > 0) {
-    document.getElementById("a-dist").textContent  = rA.distance + " km";
-    document.getElementById("a-time").textContent  = rA.timeMs + " ms";
-    document.getElementById("a-nodes").textContent = rA.visited.length + " node";
-    document.getElementById("a-path").textContent  = rA.path.join("→");
-    setTimeout(() => {
-      document.getElementById("bar-a-time").style.width  = (rA.timeMs/maxT*100).toFixed(1)+"%";
-      document.getElementById("bar-a-nodes").style.width = (rA.visited.length/maxN*100).toFixed(1)+"%";
-    }, 200);
-  }
-
-  // comparison table
-  if (rD?.path?.length > 0 && rA?.path?.length > 0) {
-    const dWT  = rD.timeMs <= rA.timeMs;
-    const dWN  = rD.visited.length <= rA.visited.length;
-    const same = rD.distance === rA.distance;
-    const ratio = (Math.max(rD.timeMs,rA.timeMs) / Math.max(Math.min(rD.timeMs,rA.timeMs),0.001)).toFixed(1);
-
-    document.getElementById("cmp-tbody").innerHTML = `
-      <tr>
-        <td>Jarak</td>
-        <td class="${same?'td-win':'td-d'}">${rD.distance} km</td>
-        <td class="${same?'td-win':'td-a'}">${rA.distance} km</td>
-        <td class="td-win">${same?'Sama':'—'}</td>
-      </tr>
-      <tr>
-        <td>Waktu (ms)</td>
-        <td class="${dWT?'td-win':'td-d'}">${rD.timeMs}</td>
-        <td class="${!dWT?'td-win':'td-a'}">${rA.timeMs}</td>
-        <td class="td-win">${dWT?'Dijkstra':'A*'}</td>
-      </tr>
-      <tr>
-        <td>Node dikunjungi</td>
-        <td class="${dWN?'td-win':'td-d'}">${rD.visited.length}</td>
-        <td class="${!dWN?'td-win':'td-a'}">${rA.visited.length}</td>
-        <td class="td-win">${dWN?'Dijkstra':'A*'}</td>
-      </tr>
-      <tr>
-        <td>Panjang rute</td>
-        <td class="td-d">${rD.path.length} hop</td>
-        <td class="td-a">${rA.path.length} hop</td>
-        <td class="td-win">${rD.path.length<=rA.path.length?'Dijkstra':'A*'}</td>
-      </tr>`;
-    document.getElementById("cmp-table").classList.add("show");
-
-    const winner = (dWT?1:0)+(dWN?1:0) >= 1 ? "Dijkstra" : "A*";
-    document.getElementById("winner-title").textContent = winner + " lebih efisien pada rute ini";
-    document.getElementById("winner-sub").textContent =
-      `Selisih waktu: ${ratio}× · Jarak ${same?'identik':'berbeda'} · ${winner} kunjungi lebih sedikit node`;
-    document.getElementById("winner-badge").classList.add("show");
-    document.getElementById(winner==="Dijkstra"?"card-d":"card-a").classList.add("win-card");
-
-    lg(`[EVALUASI] Winner: ${winner} · Jarak ${same?'identik':'berbeda'} · Rasio waktu ${ratio}×`, "ok");
-  }
-}
-
-// ── Main simulation (diperluas dengan A* & log) ───────────────────────────────
-let simRunning = false;
-
-async function startSimulation() {
-  if (simRunning) return;
-  const start = document.getElementById("start").value;
-  const end   = document.getElementById("end").value;
-  if (start === end) { alert("Start dan tujuan tidak boleh sama!"); return; }
-
-  simRunning = true;
-  document.getElementById("run-btn").disabled = true;
-
-  // reset visual
-  document.getElementById("highlight-path").setAttribute("d","");
-  document.getElementById("visited-d-layer").innerHTML = "";
-  document.getElementById("visited-a-layer").innerHTML = "";
-  document.getElementById("path-dijkstra").setAttribute("opacity","0");
-  document.getElementById("path-dijkstra").setAttribute("d","");
-  document.getElementById("path-astar").setAttribute("opacity","0");
-  document.getElementById("path-astar").setAttribute("d","");
-  document.getElementById("car").setAttribute("opacity","1");
-
-  clearLog();
-  resetResults();
-
-  lg(`[SIM] ${start} → ${end} | ${Object.keys(graph).length} node, ${countEdges(graph)} edge`, "inf");
-  lgSep();
-
-  // ── DIJKSTRA ──────────────────────────────────────────────
-  lg("[DIJKSTRA] Mulai. dist["+start+"]=0, semua lain=∞", "dijk");
-  lg("  Struktur: Min-Heap Binary → O(log V) per operasi", "dijk");
-
-  const t0d = performance.now();
-  const resD = dijkstra(graph, start, end);
-  resD.timeMs = +(performance.now() - t0d).toFixed(4);
-
-  if (resD.path.length === 0) {
-    lg("  ✗ Tidak ada rute ke " + end, "warn");
-    document.getElementById("result").innerHTML =
-      `🚫 <b>Dijkstra:</b> Tidak ada rute dari <b>${start}</b> ke <b>${end}</b>.`;
-  } else {
-    resD.order.forEach(o => lg(`  Step ${o.step}: visit ${o.node}  [dist=${o.dist}]`, "dijk"));
-    lg(`  ✓ Rute: ${resD.path.join("→")} | Jarak: ${resD.distance} | Node: ${resD.visited.length} | ${resD.timeMs}ms`, "ok");
-  }
-
-  await animateVisited(resD.visited, "visited-d-layer", "#1565c0", "rgba(21,101,192,.12)");
-  if (resD.path.length > 0) drawFinalPath(resD.path, "path-dijkstra", "#1565c0");
-
-  lgSep();
-
-  // ── A* ────────────────────────────────────────────────────
-  lg("[A-STAR] Mulai. f(n)=g(n)+h(n), h=Euclidean×0.40", "astr");
-  lg("  h admissible (tidak overestimate) → A* optimal terjamin", "astr");
-
-  const t0a = performance.now();
-  const resA = astar(graph, start, end);
-  resA.timeMs = +(performance.now() - t0a).toFixed(4);
-
-  if (resA.path.length === 0) {
-    lg("  ✗ Tidak ada rute ke " + end, "warn");
-  } else {
-    resA.order.forEach(o => lg(`  Step ${o.step}: visit ${o.node}  [g=${o.g.toFixed(0)} h=${o.h.toFixed(0)} f=${o.f.toFixed(0)}]`, "astr"));
-    lg(`  ✓ Rute: ${resA.path.join("→")} | Jarak: ${resA.distance} | Node: ${resA.visited.length} | ${resA.timeMs}ms`, "ok");
-  }
-
-  await animateVisited(resA.visited, "visited-a-layer", "#6a1b9a", "rgba(106,27,154,.12)");
-  if (resA.path.length > 0) drawFinalPath(resA.path, "path-astar", "#6a1b9a");
-
-  lgSep();
-  showResults(resD, resA);
-
-  // tampilkan result box (gaya original)
-  if (resD.path.length > 0 || resA.path.length > 0) {
-    const r = resD.path.length > 0 ? resD : resA;
-    document.getElementById("result").innerHTML =
-      `🚗 <b>Rute:</b> ${r.path.join(" ➔ ")}<br>📏 <b>Jarak:</b> ${r.distance} km ` +
-      `<span style="font-size:13px;color:#555;">(Dijkstra: ${resD.timeMs}ms · A*: ${resA.timeMs}ms)</span>`;
-  }
-
-  // ── ANIMASI MOBIL (ikuti rute terbaik di atas jalan) ──────
-  const bestPath = resD.path.length > 0 ? resD.path : (resA.path.length > 0 ? resA.path : null);
-  if (bestPath) {
-    const bestDist = resD.path.length > 0 ? resD.distance : resA.distance;
-    lg(`[MOBIL] Bergerak: ${bestPath.join("→")}`, "inf");
-    await moveCar(bestPath, bestDist);
-    lg("[MOBIL] Tiba di tujuan!", "ok");
-  }
-
-  simRunning = false;
-  document.getElementById("run-btn").disabled = false;
-}
-
-// ── Broken roads (dari original, dipertahankan) ───────────────────────────────
-function generateBrokenRoads() {
-  resetRoads();
-  const all = [];
-  for (let u in originalGraph) for (let e of originalGraph[u]) {
-    const p = [u, e.node].sort().join("-");
-    if (!all.find(r => r.id===p)) all.push({id:p, from:u, to:e.node});
-  }
-  brokenRoads = all.sort(() => Math.random()-0.5).slice(0, 3);
-  const bl = document.getElementById("broken-roads-layer");
-  for (let road of brokenRoads) {
-    const ef = graph[road.from].find(e => e.node===road.to);
-    const et = graph[road.to].find(e => e.node===road.from);
-    if (ef) ef.weight += 9999;
-    if (et) et.weight += 9999;
-    const p1=positions[road.from], p2=positions[road.to];
-    bl.innerHTML += `<path d="M ${p1.x} ${p1.y} ${getNaturalPath(p1,p2,road.from,road.to)}" class="broken-road"/>`;
-  }
-  document.getElementById("result").innerHTML =
-    `⚠️ Jalan rusak diaktifkan! Sistem mencari jalur alternatif.`;
-  clearLog();
-  lg("[JALAN RUSAK] 3 edge diblokir (bobot +9999)", "warn");
-  brokenRoads.forEach(r => lg(`  × ${r.from}—${r.to}`, "warn"));
-}
-
-function resetRoads() {
-  graph = JSON.parse(JSON.stringify(originalGraph));
-  brokenRoads = [];
-  document.getElementById("broken-roads-layer").innerHTML = "";
-  document.getElementById("result").innerHTML = `✅ Semua jalan kembali normal.`;
-  drawWeightLabels();
-  lg("[RESET] Semua jalan normal kembali", "inf");
-}
-
-// ── Randomize map (dari original + acak start/end) ────────────────────────────
-// Sesuai RPM: "posisi asal, tujuan dan peta dapat di acak
-//  untuk mencegah adanya hapalan rute secara hardcoding"
-function randomizeMap() {
-  const W=1000, H=650, PAD=75;
-  const MIN_DIST=130, MAX_EDGE=430;
-  const nodeCount = ri(7,11);
-  const nodeNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".slice(0,nodeCount).split("");
-
-  // 1. tempatkan node secara acak
-  const newPos = {};
-  for (const name of nodeNames) {
-    let placed = false;
-    for (let t=0; t<600&&!placed; t++) {
-      const px=rnd(PAD,W-PAD), py=rnd(PAD,H-PAD);
-      let ok = true;
-      for (const ep of Object.values(newPos))
-        if (Math.hypot(px-ep.x,py-ep.y)<MIN_DIST) { ok=false; break; }
-      if (ok) { newPos[name]={x:Math.round(px),y:Math.round(py)}; placed=true; }
-    }
-    if (!newPos[name]) {
-      const idx = Object.keys(newPos).length;
-      newPos[name] = {
-        x: Math.round(PAD+(idx%4)*(W-PAD*2)/3),
-        y: Math.round(PAD+Math.floor(idx/4)*(H-PAD*2)/2)
+      return {
+        path: path[0] === start ? path : [],
+        distance: dist,
+        visited,
+        order
       };
     }
-  }
 
-  // 2. bangun graf (Prim spanning tree + extra edges, anti-crossing dari original)
-  const newGraph = {};
-  for (const n of nodeNames) newGraph[n] = [];
-  const edgePts = [];
-  const addedPairs = new Set();
+    // ══════════════════════════════════════════════════════════════
+    //  DIJKSTRA'S ALGORITHM — O((V+E) log V)
+    //  Strategi: GREEDY — selalu pilih node dengan jarak terkecil
+    //  ─────────────────────────────────────────────────────────────
+    //  Kompleksitas Waktu : O((V + E) log V)
+    //    - V iterasi extract-min dari Min-Heap  → O(V log V)
+    //    - E iterasi relaksasi edge             → O(E log V)
+    //    - visited check: O(1) dengan Set (bukan O(n) dengan Array)
+    //  Kompleksitas Ruang : O(V) — dist[], prev[], visitedSet{}
+    //  Garansi: rute terpendek OPTIMAL untuk bobot ≥ 0
+    //
+    //  Pseudocode:
+    //    dist[start] = 0  ;  dist[v] = ∞  untuk semua v ≠ start
+    //    PQ.push({ node: start, f: 0 })
+    //    while PQ tidak kosong:
+    //      u = PQ.extractMin()          // node dengan dist terkecil
+    //      if u ∈ visited : skip
+    //      visited.add(u)
+    //      for setiap tetangga v dari u:
+    //        if dist[u] + w(u,v) < dist[v]:
+    //          dist[v] = dist[u] + w(u,v)
+    //          prev[v] = u
+    //          PQ.push({ node: v, f: dist[v] })
+    //    rekonstruksi path dari prev[]
+    // ══════════════════════════════════════════════════════════════
+    function dijkstra(g, start, end) {
+      const dist = {}, prev = {}, order = [];
+      // Gunakan Set untuk O(1) lookup, visited array untuk urutan animasi
+      const visitedSet = new Set(), visited = [];
+      for (const n in g) dist[n] = Infinity;
+      dist[start] = 0;
 
-  function tryAdd(u, v, mandatory) {
-    const pair = [u,v].sort().join("-");
-    if (addedPairs.has(pair)) return false;
-    const p1=newPos[u], p2=newPos[v];
-    const d = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-    if (!mandatory && d>MAX_EDGE) return false;
-    if (!mandatory && edgeCrosses(edgePts, p1, p2, u, v)) return false;
-    const w = randomWeight(p1, p2);
-    newGraph[u].push({node:v,weight:w});
-    newGraph[v].push({node:u,weight:w});
-    edgePts.push({pts:buildEdgePts(p1,p2,u,v,10), from:u, to:v});
-    addedPairs.add(pair);
-    return true;
-  }
+      const pq = new MinHeap();
+      pq.push({ f: 0, node: start });
 
-  // Prim: pilih edge terpendek yang tidak silang
-  const inTree   = new Set([nodeNames[0]]);
-  const remaining = new Set(nodeNames.slice(1));
-  while (remaining.size > 0) {
-    let bd=Infinity, bu=null, bv=null;
-    for (const u of inTree) for (const v of remaining) {
-      const d = Math.hypot(newPos[u].x-newPos[v].x, newPos[u].y-newPos[v].y);
-      if (d<bd && !edgeCrosses(edgePts,newPos[u],newPos[v],u,v)) { bd=d; bu=u; bv=v; }
-    }
-    if (!bu) {
-      // fallback: izinkan crossing untuk koneksi wajib
-      for (const u of inTree) for (const v of remaining) {
-        const d = Math.hypot(newPos[u].x-newPos[v].x, newPos[u].y-newPos[v].y);
-        if (d<bd) { bd=d; bu=u; bv=v; }
+      while (pq.size > 0) {
+        const { f: d, node: u } = pq.pop();
+        if (visitedSet.has(u)) continue;         // O(1) — lebih efisien dari includes()
+        visitedSet.add(u);
+        visited.push(u);
+        order.push({ node: u, dist: d, step: visited.length });
+        if (u === end) break;
+
+        for (const nb of g[u]) {
+          const nd = dist[u] + nb.weight;        // relaksasi edge
+          if (nd < dist[nb.node]) {
+            dist[nb.node] = nd;
+            prev[nb.node] = u;
+            pq.push({ f: nd, node: nb.node });
+          }
+        }
       }
+
+      // rekonstruksi path dari prev[]
+      const path = []; let cur = end;
+      while (cur !== undefined) { path.unshift(cur); cur = prev[cur]; }
+
+      return {
+        path: path[0] === start ? path : [],
+        distance: dist[end],
+        visited,
+        order
+      };
     }
-    if (!bu) break;
-    tryAdd(bu, bv, true);
-    inTree.add(bv); remaining.delete(bv);
-  }
 
-  // extra edges tidak silang
-  const extra = Math.floor(nodeCount*0.55);
-  const allPairs = [];
-  for (let i=0; i<nodeNames.length; i++)
-    for (let j=i+1; j<nodeNames.length; j++)
-      allPairs.push([nodeNames[i],nodeNames[j]]);
-  allPairs.sort(() => Math.random()-0.5);
-  let added = 0;
-  for (const [u,v] of allPairs) {
-    if (added >= extra) break;
-    if (tryAdd(u,v,false)) added++;
-  }
+    // ══════════════════════════════════════════════════════════════
+    //  A* (A-STAR) ALGORITHM — O(E log V) average
+    //  ─────────────────────────────────────────────────────────────
+    //  Kompleksitas Waktu : O(E log V) rata-rata, jika h admissible
+    //    - visited check: O(1) dengan Set (bukan O(n) dengan Array)
+    //  Kompleksitas Ruang : O(V) — gCost[], fCost[], prev[], visitedSet{}
+    //
+    //  Fungsi evaluasi: f(n) = g(n) + h(n)
+    //    g(n) = biaya aktual dari start ke n
+    //    h(n) = heuristik Euclidean × 0.40
+    //           [ADMISSIBLE: h(n) ≤ biaya nyata → A* PASTI OPTIMAL]
+    //
+    //  Pseudocode:
+    //    g[start] = 0  ;  f[start] = h(start, end)
+    //    open.push({ node: start, f: f[start] })
+    //    while open tidak kosong:
+    //      u = open.extractMin()        // node dengan f(n) terkecil
+    //      if u ∈ visited : skip
+    //      visited.add(u)
+    //      if u == end : selesai
+    //      for setiap tetangga v dari u:
+    //        gNew = g[u] + w(u,v)
+    //        if gNew < g[v]:
+    //          g[v]    = gNew
+    //          f[v]    = g[v] + h(v, end)
+    //          prev[v] = u
+    //          open.push({ node: v, f: f[v] })
+    //    rekonstruksi path dari prev[]
+    // ══════════════════════════════════════════════════════════════
+    function heuristic(a, b) {
+      // Euclidean distance × 0.40 — scaling agar admissible
+      return Math.hypot(positions[a].x - positions[b].x, positions[a].y - positions[b].y) * 0.40;
+    }
 
-  // 3. acak start & end secara random
-  const shuffled = [...nodeNames].sort(() => Math.random()-0.5);
-  const randStart = shuffled[0], randEnd = shuffled[1];
+    function astar(g, start, end) {
+      const gCost = {}, fCost = {}, prev = {}, order = [];
+      // Gunakan Set untuk O(1) lookup, visited array untuk urutan animasi
+      const visitedSet = new Set(), visited = [];
+      for (const n in g) { gCost[n] = Infinity; fCost[n] = Infinity; }
+      gCost[start] = 0;
+      fCost[start] = heuristic(start, end);
 
-  // 4. apply
-  originalGraph = JSON.parse(JSON.stringify(newGraph));
-  graph         = JSON.parse(JSON.stringify(newGraph));
-  positions     = newPos;
-  brokenRoads   = [];
+      const open = new MinHeap();
+      open.push({ f: fCost[start], node: start });
 
-  document.getElementById("broken-roads-layer").innerHTML = "";
-  document.getElementById("highlight-path").setAttribute("d","");
-  document.getElementById("visited-d-layer").innerHTML = "";
-  document.getElementById("visited-a-layer").innerHTML = "";
-  document.getElementById("path-dijkstra").setAttribute("opacity","0");
-  document.getElementById("path-astar").setAttribute("opacity","0");
+      while (open.size > 0) {
+        const { node: u } = open.pop();
+        if (visitedSet.has(u)) continue;         // O(1) — lebih efisien dari includes()
+        visitedSet.add(u);
+        visited.push(u);
+        order.push({
+          node: u,
+          g: gCost[u],
+          h: heuristic(u, end),
+          f: fCost[u],
+          step: visited.length
+        });
+        if (u === end) break;
 
-  populateSelects();
-  document.getElementById("start").value = randStart;
-  document.getElementById("end").value   = randEnd;
+        for (const nb of g[u]) {
+          const gNew = gCost[u] + nb.weight;
+          if (gNew < gCost[nb.node]) {
+            gCost[nb.node] = gNew;
+            fCost[nb.node] = gNew + heuristic(nb.node, end);
+            prev[nb.node] = u;
+            open.push({ f: fCost[nb.node], node: nb.node });
+          }
+        }
+      }
 
-  drawMap(true, edgePts);
+      // rekonstruksi path dari prev[]
+      const path = []; let cur = end;
+      while (cur !== undefined) { path.unshift(cur); cur = prev[cur]; }
 
-  document.getElementById("result").innerHTML =
-    `🎲 Peta diacak! <b>${nodeCount} kota</b>, <b>${countEdges(newGraph)} jalan</b>. Start: <b>${randStart}</b> → <b>${randEnd}</b>`;
+      return {
+        path: path[0] === start ? path : [],
+        distance: gCost[end],
+        visited,
+        order
+      };
+    }
 
-  clearLog();
-  lg(`[ACAK] ${nodeCount} kota · ${countEdges(newGraph)} jalan · Start:${randStart} → End:${randEnd}`, "inf");
-}
+    // ══════════════════════════════════════════════════════════════
+    //  CAR ANIMATION — FIX MUTER-MUTER
+    //  ─────────────────────────────────────────────────────────────
+    //  ROOT CAUSE:
+    //    rotate="auto" memutar seluruh <g id="car">, termasuk roda
+    //    yang sudah punya @keyframes spinning → dua rotasi konflik.
+    //
+    //  SOLUSI: pisah jadi 2 elemen SVG terpisah:
+    //    1. <g id="car-body">   → ikut animateMotion + rotate="auto"
+    //                              berisi bodi + jendela + lampu saja
+    //    2. <g id="car-wheels"> → posisi di-update manual
+    //                              via requestAnimationFrame
+    //                              roda TIDAK ikut rotate path
+    // ══════════════════════════════════════════════════════════════
+    const wait = ms => new Promise(r => setTimeout(r, ms));
 
-function randomWeight(p1,p2) {
-  const d = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-  const base = Math.round(d*0.4);
-  return Math.max(50, base + Math.round((Math.random()-0.5)*base*0.5));
-}
+    function buildPathD(path) {
+      let d = `M ${positions[path[0]].x} ${positions[path[0]].y} `;
+      for (let i = 1; i < path.length; i++)
+        d += getNaturalPath(positions[path[i - 1]], positions[path[i]], path[i - 1], path[i]) + " ";
+      return d;
+    }
 
-function countEdges(g) {
-  let c=0; const s=new Set();
-  for (let u in g) for (let e of g[u]) {
-    const p=[u,e.node].sort().join("-");
-    if (!s.has(p)) { s.has(p); s.add(p); c++; }
-  }
-  return c;
-}
+    // Interpolasi posisi di sepanjang multi-segment bezier path
+    function samplePathPos(path, t) {
+      const segs = []; let total = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const p1 = positions[path[i]], p2 = positions[path[i + 1]];
+        const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        segs.push({ p1, p2, n1: path[i], n2: path[i + 1], len });
+        total += len;
+      }
+      let target = t * total, acc = 0;
+      for (const seg of segs) {
+        if (acc + seg.len >= target)
+          return bezierPoint(seg.p1, seg.p2, seg.n1, seg.n2, (target - acc) / seg.len);
+        acc += seg.len;
+      }
+      return { ...positions[path[path.length - 1]] };
+    }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", () => {
-  populateSelects();
-  drawMap(false);
-  document.getElementById("start").addEventListener("change", updateFlags);
-  document.getElementById("end").addEventListener("change", updateFlags);
-});
-</script>
+    async function moveCar(path, distance) {
+      const carBody = document.getElementById("car-body");
+      const carWheels = document.getElementById("car-wheels");
+
+      // hapus animasi lama agar tidak stuck di posisi sebelumnya
+      document.getElementById("car-anim-body")?.remove();
+
+      const pathD = buildPathD(path);
+      const dur = Math.max(1.5, distance / 150);
+
+      // highlight path merah (dari original)
+      const hp = document.getElementById("highlight-path");
+      hp.setAttribute("d", pathD);
+      hp.setAttribute("opacity", "0.85");
+
+      // ── 1. bodi mobil: animateMotion + rotate="auto" ──────────
+      carBody.setAttribute("opacity", "1");
+      const animBody = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+      animBody.setAttribute("id", "car-anim-body");
+      animBody.setAttribute("dur", `${dur}s`);
+      animBody.setAttribute("fill", "freeze");
+      animBody.setAttribute("rotate", "auto");   // bodi menghadap arah jalan
+      animBody.setAttribute("path", pathD);
+      carBody.appendChild(animBody);
+      animBody.beginElement();
+
+      // ── 2. roda: posisi manual, spin CSS saja ─────────────────
+      // aktifkan spin HANYA saat bergerak
+      document.querySelectorAll(".wheel-inner").forEach(w => w.classList.add("wheel-spin"));
+      carWheels.setAttribute("opacity", "1");
+
+      const t0 = performance.now(), durMs = dur * 1000;
+
+      function frame(now) {
+        const t = Math.min((now - t0) / durMs, 1);
+        const pos = samplePathPos(path, t);
+        carWheels.setAttribute("transform", `translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)})`);
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          // selesai: sembunyikan roda, matikan spin
+          carWheels.setAttribute("opacity", "0");
+          document.querySelectorAll(".wheel-inner").forEach(w => w.classList.remove("wheel-spin"));
+        }
+      }
+      requestAnimationFrame(frame);
+
+      await wait(durMs);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  STEP-BY-STEP VISUAL DI PETA (bobot 40 poin)
+    //  Tampilkan nilai dist= / f=g+h / hop= langsung di atas node
+    // ══════════════════════════════════════════════════════════════
+    const aniDelay = () => wait(Math.max(10, 200 / SPEED));
+
+    async function animateVisited(orderArr, layerId, stroke, fill, labelColor, algoType) {
+      const layer = document.getElementById(layerId);
+      const lblLayer = document.getElementById("node-labels-layer");
+      const ctr = document.getElementById("step-ctr");
+      ctr.style.display = "block";
+
+      for (let i = 0; i < orderArr.length; i++) {
+        const o = orderArr[i], p = positions[o.node];
+        if (!p) continue;
+
+        ctr.textContent = `STEP ${o.step}/${orderArr.length} — Node: ${o.node}`;
+
+        // lingkaran highlight
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
+        c.setAttribute("r", "20"); c.setAttribute("fill", fill);
+        c.setAttribute("stroke", stroke); c.setAttribute("stroke-width", "2");
+        c.setAttribute("opacity", ".5");
+        layer.appendChild(c);
+
+        // label nilai di atas node
+        let val = "";
+        if (algoType === "dijkstra") val = `d=${o.dist}`;
+        else if (algoType === "astar") val = `f=${Math.round(o.f)}`;
+        else if (algoType === "bfs") val = `#${o.step}`;
+
+        const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        bg.setAttribute("x", (p.x - 20).toFixed(1)); bg.setAttribute("y", (p.y - 39).toFixed(1));
+        bg.setAttribute("width", "40"); bg.setAttribute("height", "14");
+        bg.setAttribute("rx", "4"); bg.setAttribute("fill", "#111"); bg.setAttribute("opacity", ".88");
+        lblLayer.appendChild(bg);
+
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", p.x.toFixed(1)); txt.setAttribute("y", (p.y - 29).toFixed(1));
+        txt.setAttribute("text-anchor", "middle"); txt.setAttribute("dominant-baseline", "middle");
+        txt.setAttribute("font-size", "9"); txt.setAttribute("font-weight", "bold");
+        txt.setAttribute("fill", labelColor); txt.setAttribute("font-family", "monospace");
+        txt.setAttribute("pointer-events", "none");
+        txt.textContent = val;
+        lblLayer.appendChild(txt);
+
+        await aniDelay();
+      }
+      ctr.style.display = "none";
+    }
+
+    function drawFinalPath(path, elId, opacity) {
+      if (!path || path.length < 2) return;
+      const el = document.getElementById(elId);
+      el.setAttribute("d", buildPathD(path));
+      el.setAttribute("opacity", opacity || "1");
+    }
+
+    // ── Log ───────────────────────────────────────────────────────
+    function lg(msg, cls = "inf") {
+      const b = document.getElementById("log-body");
+      const d = document.createElement("div");
+      d.className = "ll " + cls;
+      d.textContent = msg;
+      b.appendChild(d);
+      b.scrollTop = b.scrollHeight;
+    }
+    function lgSep() { lg("─".repeat(36), "sep"); }
+    function clearLog() { document.getElementById("log-body").innerHTML = ""; }
+
+    // ── Reset results ─────────────────────────────────────────────
+    function resetResults() {
+      ["d-dist", "d-time", "d-nodes", "d-path",
+        "a-dist", "a-time", "a-nodes", "a-path",
+        "b-dist", "b-time", "b-nodes", "b-path"]
+        .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "—"; });
+      ["bar-d-time", "bar-d-nodes", "bar-a-time", "bar-a-nodes", "bar-b-time", "bar-b-nodes"]
+        .forEach(id => { const el = document.getElementById(id); if (el) el.style.width = "0%"; });
+      document.getElementById("winner-badge").classList.remove("show");
+      document.getElementById("cmp-table").classList.remove("show");
+      document.getElementById("eval-box").style.display = "none";
+      ["card-d", "card-a", "card-b"].forEach(id => document.getElementById(id)?.classList.remove("win-card"));
+    }
+
+    // ── Show results & evaluasi (bobot 30 poin) ───────────────────
+    function showResults(rD, rA, rB) {
+      const maxT = Math.max(rD?.timeMs || 0, rA?.timeMs || 0, rB?.timeMs || 0) || 1;
+      const maxN = Math.max(rD?.visited?.length || 0, rA?.visited?.length || 0, rB?.visited?.length || 0) || 1;
+
+      function fillCard(px, r) {
+        if (!r?.path?.length) return;
+        document.getElementById(px + "-dist").textContent = r.distance + " km";
+        document.getElementById(px + "-time").textContent = r.timeMs + " ms";
+        document.getElementById(px + "-nodes").textContent = r.visited.length + " node";
+        document.getElementById(px + "-path").textContent = r.path.join("→");
+        setTimeout(() => {
+          document.getElementById("bar-" + px + "-time").style.width = (r.timeMs / maxT * 100).toFixed(1) + "%";
+          document.getElementById("bar-" + px + "-nodes").style.width = (r.visited.length / maxN * 100).toFixed(1) + "%";
+        }, 200);
+      }
+      fillCard("d", rD);
+      fillCard("a", rA);
+      fillCard("b", rB);
+
+      if (!rD?.path?.length || !rA?.path?.length) return;
+
+      const dWT = rD.timeMs <= rA.timeMs;
+      const dWN = rD.visited.length <= rA.visited.length;
+      const same = rD.distance === rA.distance;
+      const ratio = (Math.max(rD.timeMs, rA.timeMs) / Math.max(Math.min(rD.timeMs, rA.timeMs), 0.001)).toFixed(1);
+      const hasB = rB?.path?.length > 0;
+
+      // tabel perbandingan
+      document.getElementById("cmp-tbody").innerHTML = `
+    <tr>
+      <td>Jarak (km)</td>
+      <td class="${same ? 'td-win' : 'td-d'}">${rD.distance}</td>
+      <td class="${same ? 'td-win' : 'td-a'}">${rA.distance}</td>
+      ${hasB ? `<td class="td-b">${rB.distance}</td>` : "<td>—</td>"}
+      <td class="td-win">${same ? "Sama" : "—"}</td>
+    </tr>
+    <tr>
+      <td>Waktu (ms)</td>
+      <td class="${dWT ? 'td-win' : 'td-d'}">${rD.timeMs}</td>
+      <td class="${!dWT ? 'td-win' : 'td-a'}">${rA.timeMs}</td>
+      ${hasB ? `<td class="td-b">${rB.timeMs}</td>` : "<td>—</td>"}
+      <td class="td-win">${dWT ? "Dijkstra" : "A*"}</td>
+    </tr>
+    <tr>
+      <td>Node dikunjungi</td>
+      <td class="${dWN ? 'td-win' : 'td-d'}">${rD.visited.length}</td>
+      <td class="${!dWN ? 'td-win' : 'td-a'}">${rA.visited.length}</td>
+      ${hasB ? `<td class="td-b">${rB.visited.length}</td>` : "<td>—</td>"}
+      <td class="td-win">${dWN ? "Dijkstra" : "A*"}</td>
+    </tr>
+    <tr>
+      <td>Hop</td>
+      <td class="td-d">${rD.path.length - 1}</td>
+      <td class="td-a">${rA.path.length - 1}</td>
+      ${hasB ? `<td class="td-b">${rB.path.length - 1}</td>` : "<td>—</td>"}
+      <td class="td-win">${rD.path.length <= rA.path.length ? "Dijkstra" : "A*"}</td>
+    </tr>
+    <tr>
+      <td>Kompleksitas</td>
+      <td class="td-d" style="font-size:9px">O((V+E)logV)</td>
+      <td class="td-a" style="font-size:9px">O(E log V)</td>
+      ${hasB ? `<td class="td-b" style="font-size:9px">O(V+E)</td>` : "<td>—</td>"}
+      <td>—</td>
+    </tr>`;
+      document.getElementById("cmp-table").classList.add("show");
+
+      // evaluasi kelebihan & kekurangan
+      const winner = (dWT ? 1 : 0) + (dWN ? 1 : 0) >= 1 ? "Dijkstra" : "A*";
+      const eb = document.getElementById("eval-box");
+      eb.style.display = "block";
+      eb.innerHTML = `
+    <div class="eval-title">📊 Evaluasi Algoritma</div>
+    <div class="eval-row">
+      <span class="eval-algo dijkstra">Dijkstra</span>
+      <span>${rD.visited.length} node · ${rD.timeMs}ms · ${rD.distance}km<br>
+      <span class="eval-note">
+        ✅ Strategi Greedy — selalu pilih node berbobot terkecil<br>
+        ✅ Optimal — jamin rute terpendek (bobot ≥ 0)<br>
+        ✅ Tidak butuh heuristik<br>
+        ❌ Exhaustive — kunjungi semua node yang mungkin
+      </span></span>
+    </div>
+    <div class="eval-row">
+      <span class="eval-algo astar">A-Star</span>
+      <span>${rA.visited.length} node · ${rA.timeMs}ms · ${rA.distance}km<br>
+      <span class="eval-note">
+        ✅ Optimal jika h(n) admissible<br>
+        ✅ Terarah — kunjungi lebih sedikit node dari Dijkstra<br>
+        ❌ Butuh fungsi heuristik yang baik
+      </span></span>
+    </div>
+    ${hasB ? `
+    <div class="eval-row">
+      <span class="eval-algo bfs">BFS</span>
+      <span>${rB.visited.length} node · ${rB.timeMs}ms · ${rB.distance}km<br>
+      <span class="eval-note">
+        ✅ Sederhana — O(V+E), tidak butuh bobot<br>
+        ❌ Abaikan bobot edge → jarak bisa TIDAK optimal<br>
+        ❌ Hanya optimal untuk graf tanpa bobot
+      </span></span>
+    </div>` : ""}
+    <div class="eval-conclusion">
+      🏆 <b>${winner}</b> paling efisien pada rute ini.<br>
+      ${same
+          ? "Dijkstra dan A* menghasilkan jarak yang <b>identik</b>."
+          : rD.distance < rA.distance
+            ? "Dijkstra menghasilkan jarak lebih pendek."
+            : "A* menghasilkan jarak lebih pendek."
+        }
+      A* mengunjungi <b>${Math.abs(rA.visited.length - rD.visited.length)}</b> node
+      ${rA.visited.length < rD.visited.length ? "lebih sedikit" : "lebih banyak"}
+      dibanding Dijkstra.
+    </div>`;
+
+      document.getElementById("winner-title").textContent = winner + " lebih efisien pada rute ini";
+      document.getElementById("winner-sub").textContent =
+        `Selisih waktu ${ratio}× · Jarak ${same ? "identik" : "berbeda"} · ${winner} kunjungi lebih sedikit node`;
+      document.getElementById("winner-badge").classList.add("show");
+      document.getElementById(winner === "Dijkstra" ? "card-d" : "card-a").classList.add("win-card");
+
+      lg(`[EVALUASI] Winner: ${winner} · Waktu ${ratio}× · Jarak ${same ? "sama" : "beda"}`, "ok");
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  MAIN SIMULATION
+    // ══════════════════════════════════════════════════════════════
+    async function startSimulation() {
+      if (simRunning) return;
+      const start = document.getElementById("start").value;
+      const end = document.getElementById("end").value;
+      if (start === end) { alert("Start dan tujuan tidak boleh sama!"); return; }
+
+      simRunning = true;
+      document.getElementById("run-btn").disabled = true;
+      resetSimVisuals();
+      clearLog();
+      resetResults();
+
+      lg(`[SIM] ${start} → ${end} | ${Object.keys(graph).length} node, ${countEdges(graph)} edge`, "inf");
+      lgSep();
+
+      // ── BFS ────────────────────────────────────────────────────
+      lg("[BFS] Kompleksitas O(V+E). Tidak pakai bobot.", "bfslog");
+      const t0b = performance.now();
+      const rB = bfs(graph, start, end);
+      rB.timeMs = +(performance.now() - t0b).toFixed(4);
+
+      if (!rB.path.length) {
+        lg(`  ✗ Tidak ada rute ke ${end}`, "warn");
+      } else {
+        rB.order.forEach(o => lg(`  Step ${o.step}: kunjungi ${o.node}`, "bfslog"));
+        lg(`  ✓ ${rB.path.join("→")} | ${rB.distance}km | ${rB.visited.length} node | ${rB.timeMs}ms`, "ok");
+      }
+      await animateVisited(rB.order, "visited-bfs-layer", "#f59e0b", "rgba(245,158,11,.1)", "#f59e0b", "bfs");
+      if (rB.path.length) drawFinalPath(rB.path, "path-bfs", "0.45");
+      lgSep();
+
+      // ── DIJKSTRA ───────────────────────────────────────────────
+      lg(`[DIJKSTRA] Strategi: GREEDY. dist[${start}]=0, semua=∞. Min-Heap O(log V).`, "dijk");
+      const t0d = performance.now();
+      const rD = dijkstra(graph, start, end);
+      rD.timeMs = +(performance.now() - t0d).toFixed(4);
+
+      if (!rD.path.length) {
+        lg(`  ✗ Tidak ada rute ke ${end}`, "warn");
+      } else {
+        rD.order.forEach(o => lg(`  Step ${o.step}: ${o.node}  dist=${o.dist}`, "dijk"));
+        lg(`  ✓ ${rD.path.join("→")} | ${rD.distance}km | ${rD.visited.length} node | ${rD.timeMs}ms`, "ok");
+      }
+      document.getElementById("node-labels-layer").innerHTML = "";
+      await animateVisited(rD.order, "visited-d-layer", "#1565c0", "rgba(21,101,192,.12)", "#60a5fa", "dijkstra");
+      if (rD.path.length) drawFinalPath(rD.path, "path-dijkstra", "1");
+      lgSep();
+
+      // ── A* ─────────────────────────────────────────────────────
+      lg("[A-STAR] f(n)=g(n)+h(n). h=Euclidean×0.40 (admissible).", "astr");
+      const t0a = performance.now();
+      const rA = astar(graph, start, end);
+      rA.timeMs = +(performance.now() - t0a).toFixed(4);
+
+      if (!rA.path.length) {
+        lg(`  ✗ Tidak ada rute ke ${end}`, "warn");
+      } else {
+        rA.order.forEach(o => lg(`  Step ${o.step}: ${o.node}  g=${o.g.toFixed(0)} h=${o.h.toFixed(0)} f=${o.f.toFixed(0)}`, "astr"));
+        lg(`  ✓ ${rA.path.join("→")} | ${rA.distance}km | ${rA.visited.length} node | ${rA.timeMs}ms`, "ok");
+      }
+      document.getElementById("node-labels-layer").innerHTML = "";
+      await animateVisited(rA.order, "visited-a-layer", "#6a1b9a", "rgba(106,27,154,.12)", "#c084fc", "astar");
+      if (rA.path.length) drawFinalPath(rA.path, "path-astar", "0.85");
+      lgSep();
+
+      // ── Hasil & evaluasi ───────────────────────────────────────
+      showResults(rD, rA, rB);
+
+      const r = rD.path.length > 0 ? rD : (rA.path.length > 0 ? rA : null);
+      if (r) {
+        document.getElementById("result").innerHTML =
+          `📦 <b>Paket terkirim! Rute (Dijkstra):</b> ${rD.path.length > 0 ? rD.path.join(" ➔ ") : "—"} &nbsp;|&nbsp; 📏 ${rD.path.length > 0 ? rD.distance : "—"}km` +
+          `<span style="font-size:12px;color:#555;"> · D:${rD.timeMs}ms · A*:${rA.timeMs}ms · BFS:${rB.timeMs}ms</span>`;
+      }
+
+      // ── Mobil bergerak di atas jalan ───────────────────────────
+      const best = rD.path.length > 0 ? rD.path : (rA.path.length > 0 ? rA.path : null);
+      if (best) {
+        const bestDist = rD.path.length > 0 ? rD.distance : rA.distance;
+        lg(`[KURIR] Mengantarkan paket: ${best.join("→")}`, "inf");
+        await moveCar(best, bestDist);
+        lg("[KURIR] Paket berhasil diantarkan ke tujuan! ✅", "ok");
+      }
+
+      simRunning = false;
+      document.getElementById("run-btn").disabled = false;
+    }
+
+    // ── Broken roads ──────────────────────────────────────────────
+    function generateBrokenRoads() {
+      resetRoads();
+      const all = [];
+      for (const u in originalGraph) {
+        for (const e of originalGraph[u]) {
+          const p = [u, e.node].sort().join("-");
+          if (!all.find(r => r.id === p)) all.push({ id: p, from: u, to: e.node });
+        }
+      }
+      brokenRoads = all.sort(() => Math.random() - 0.5).slice(0, 3);
+      const bl = document.getElementById("broken-roads-layer");
+      for (const road of brokenRoads) {
+        const ef = graph[road.from]?.find(e => e.node === road.to);
+        const et = graph[road.to]?.find(e => e.node === road.from);
+        if (ef) ef.weight += 9999;
+        if (et) et.weight += 9999;
+        const p1 = positions[road.from], p2 = positions[road.to];
+        bl.innerHTML += `<path d="M ${p1.x} ${p1.y} ${getNaturalPath(p1, p2, road.from, road.to)}" class="broken-road"/>`;
+      }
+      document.getElementById("result").innerHTML = "⚠️ 3 jalan rusak! Kurir mencari jalur pengiriman alternatif.";
+      clearLog();
+      lg("[JALAN RUSAK] 3 edge diblokir (bobot + 9999)", "warn");
+      brokenRoads.forEach(r => lg(`  × ${r.from}—${r.to}`, "warn"));
+    }
+
+    function resetRoads() {
+      graph = JSON.parse(JSON.stringify(originalGraph));
+      brokenRoads = [];
+      document.getElementById("broken-roads-layer").innerHTML = "";
+      document.getElementById("result").innerHTML = "✅ Semua jalan normal. Kurir siap mengantar paket!";
+      drawWeightLabels();
+    }
+
+    // ── Randomize map ─────────────────────────────────────────────
+    function randomizeMap() {
+      const W = 1000, H = 650, PAD = 75, MIN_D = 130, MAX_E = 430;
+      const nc = ri(7, 11);
+      const names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".slice(0, nc).split("");
+      const newPos = {};
+
+      for (const nm of names) {
+        let placed = false;
+        for (let t = 0; t < 600 && !placed; t++) {
+          const px = rnd(PAD, W - PAD), py = rnd(PAD, H - PAD);
+          let ok = true;
+          for (const ep of Object.values(newPos))
+            if (Math.hypot(px - ep.x, py - ep.y) < MIN_D) { ok = false; break; }
+          if (ok) { newPos[nm] = { x: Math.round(px), y: Math.round(py) }; placed = true; }
+        }
+        if (!newPos[nm]) {
+          const idx = Object.keys(newPos).length;
+          newPos[nm] = {
+            x: Math.round(PAD + (idx % 4) * (W - PAD * 2) / 3),
+            y: Math.round(PAD + Math.floor(idx / 4) * (H - PAD * 2) / 2)
+          };
+        }
+      }
+
+      const nG = {};
+      for (const n of names) nG[n] = [];
+      const ePts = [], ap = new Set();
+
+      function tryAdd(u, v, mandatory) {
+        const pair = [u, v].sort().join("-");
+        if (ap.has(pair)) return false;
+        const p1 = newPos[u], p2 = newPos[v];
+        const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        if (!mandatory && d > MAX_E) return false;
+        if (!mandatory && edgeCrosses(ePts, p1, p2, u, v)) return false;
+        const w = Math.max(50, Math.round(d * 0.4 + rnd(-25, 25)));
+        nG[u].push({ node: v, weight: w });
+        nG[v].push({ node: u, weight: w });
+        ePts.push({ pts: buildEdgePts(p1, p2, u, v, 10), from: u, to: v });
+        ap.add(pair);
+        return true;
+      }
+
+      // Prim spanning tree → garansi semua node terhubung
+      const inT = new Set([names[0]]), rem = new Set(names.slice(1));
+      while (rem.size > 0) {
+        let bd = Infinity, bu = null, bv = null;
+        for (const u of inT)
+          for (const v of rem) {
+            const d = Math.hypot(newPos[u].x - newPos[v].x, newPos[u].y - newPos[v].y);
+            if (d < bd && !edgeCrosses(ePts, newPos[u], newPos[v], u, v)) { bd = d; bu = u; bv = v; }
+          }
+        // fallback jika semua crossing (tetap harus connect)
+        if (!bu) {
+          for (const u of inT)
+            for (const v of rem) {
+              const d = Math.hypot(newPos[u].x - newPos[v].x, newPos[u].y - newPos[v].y);
+              if (d < bd) { bd = d; bu = u; bv = v; }
+            }
+        }
+        if (!bu) break;
+        tryAdd(bu, bv, true);
+        inT.add(bv); rem.delete(bv);
+      }
+
+      // extra edges acak (non-crossing)
+      const extra = Math.floor(nc * 0.55), allP = [];
+      for (let i = 0; i < names.length; i++)
+        for (let j = i + 1; j < names.length; j++)
+          allP.push([names[i], names[j]]);
+      allP.sort(() => Math.random() - 0.5);
+      let added = 0;
+      for (const [u, v] of allP) {
+        if (added >= extra) break;
+        if (tryAdd(u, v, false)) added++;
+      }
+
+      // acak start & end
+      const shuffled = [...names].sort(() => Math.random() - 0.5);
+      const rs = shuffled[0], re = shuffled[1];
+
+      originalGraph = JSON.parse(JSON.stringify(nG));
+      graph = JSON.parse(JSON.stringify(nG));
+      positions = newPos;
+      brokenRoads = [];
+
+      populateSelects();
+      document.getElementById("start").value = rs;
+      document.getElementById("end").value = re;
+      drawMap(true, ePts);
+
+      document.getElementById("result").innerHTML =
+        `🎲 Peta diacak! <b>${nc} kota, ${ap.size} jalan</b>. Kurir dari: <b>${rs}</b> → <b>${re}</b>`;
+      clearLog();
+      lg(`[ACAK] ${nc} kota · ${ap.size} jalan · ${rs}→${re}`, "inf");
+    }
+
+    function countEdges(g) {
+      let c = 0; const s = new Set();
+      for (const u in g)
+        for (const e of g[u]) {
+          const p = [u, e.node].sort().join("-");
+          if (!s.has(p)) { s.add(p); c++; }
+        }
+      return c;
+    }
+
+    // ── Init ──────────────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      populateSelects();
+      drawMap(false);
+      document.getElementById("start").addEventListener("change", () => { resetSimVisuals(); updateFlags(); });
+      document.getElementById("end").addEventListener("change", () => { resetSimVisuals(); updateFlags(); });
+    });
+  </script>
 </body>
+
 </html>
