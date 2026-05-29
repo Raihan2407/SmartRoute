@@ -157,8 +157,8 @@ main.js
 
 1. Clone repository ini
    ```bash
-   git clone https://github.com/[username]/smartroute-paa2026.git
-   cd smartroute-paa2026
+   git clone https://github.com/Raihan2407/SmartRoute.git
+   cd SmartRoute
    ```
 
 2. Buka `index.html` di browser (Chrome/Firefox/Edge)
