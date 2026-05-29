@@ -265,7 +265,7 @@ function resetSimVisuals() {
       document.getElementById(id).setAttribute("opacity", "0");
     });
 
-  // Sembunyikan car (jangan set transform — biarkan animateMotion handle posisi)
+  // Sembunyikan car — reset posisi
   document.getElementById("car-body").setAttribute("opacity", "0");
   document.getElementById("car-wheels").setAttribute("opacity", "0");
 
@@ -485,29 +485,48 @@ function dijkstra(g, start, end) {
     path: path[0] === start ? path : [],
     distance: dist[end],
     visited,
-    order
+    order                           // dipakai oleh animateVisited() untuk visualisasi
   };
 }
 
 // ══════════════════════════════════════════════════════════════
 //  A* (A-STAR) ALGORITHM — O(E log V) average
+//  Informed Search — f(n) = g(n) + h(n)
 //  ─────────────────────────────────────────────────────────────
-//  Kompleksitas Waktu : O(E log V) rata-rata, jika h admissible
-//    - visited check: O(1) dengan Set (bukan O(n) dengan Array)
-//  Kompleksitas Ruang : O(V) — gCost[], fCost[], prev[], visitedSet{}
+//  @contributor  M. Kika Haekal
+//                (Implementasi A*, heuristic(), Bukti Admissibility,
+//                 Analisis Kompleksitas A*)
 //
 //  Fungsi evaluasi: f(n) = g(n) + h(n)
-//    g(n) = biaya aktual dari start ke n
-//    h(n) = heuristik Euclidean × 0.40
-//           [ADMISSIBLE: h(n) ≤ biaya nyata → A* PASTI OPTIMAL]
+//    g(n) = biaya aktual dari start ke node n
+//    h(n) = heuristik Euclidean × 0.40  [ADMISSIBLE]
+//    f(n) = estimasi total biaya jalur melewati n
+//
+//  Bukti Admissibility heuristic:
+//    h(n) = Euclidean(n, end) × 0.40
+//    Bobot minimum edge = jarak Euclidean × ~0.40 (lihat randomizeMap)
+//    ∴ h(n) ≤ biaya nyata ke tujuan → A* PASTI OPTIMAL  ✓
+//    Karena h admissible, A* tidak akan melewatkan rute terpendek.
+//
+//  Kompleksitas Waktu : O(E log V) rata-rata
+//    - Dengan h admissible, A* mengekspansi lebih sedikit node
+//      dari Dijkstra karena terarah ke tujuan.
+//    - visitedSet.has(u): O(1) dengan Set, bukan O(n) dengan Array
+//    - Worst case = O((V+E) log V) jika h(n) = 0 (≡ Dijkstra)
+//
+//  Kompleksitas Ruang : O(V)
+//    - gCost[]     : O(V) — biaya aktual dari start ke tiap node
+//    - fCost[]     : O(V) — nilai f(n) = g(n) + h(n)
+//    - prev[]      : O(V) — rekonstruksi jalur
+//    - visitedSet{}: O(V) — Set untuk lookup O(1)
 //
 //  Pseudocode:
 //    g[start] = 0  ;  f[start] = h(start, end)
 //    open.push({ node: start, f: f[start] })
 //    while open tidak kosong:
-//      u = open.extractMin()        // node dengan f(n) terkecil
-//      if u ∈ visited : skip
-//      visited.add(u)
+//      u = open.extractMin()        // O(log V) — node f(n) terkecil
+//      if u ∈ visitedSet : skip     // O(1) lookup
+//      visitedSet.add(u)
 //      if u == end : selesai
 //      for setiap tetangga v dari u:
 //        gNew = g[u] + w(u,v)
@@ -515,8 +534,8 @@ function dijkstra(g, start, end) {
 //          g[v]    = gNew
 //          f[v]    = g[v] + h(v, end)
 //          prev[v] = u
-//          open.push({ node: v, f: f[v] })
-//    rekonstruksi path dari prev[]
+//          open.push({ node: v, f: f[v] })  // O(log V)
+//    rekonstruksi: path.unshift(cur) saat cur = prev[cur]
 // ══════════════════════════════════════════════════════════════
 function heuristic(a, b) {
   // Euclidean distance × 0.40 — scaling agar admissible
@@ -572,18 +591,13 @@ function astar(g, start, end) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  CAR ANIMATION — FIX MUTER-MUTER
+//  CAR ANIMATION — SATU SISTEM (requestAnimationFrame)
 //  ─────────────────────────────────────────────────────────────
-//  ROOT CAUSE:
-//    rotate="auto" memutar seluruh <g id="car">, termasuk roda
-//    yang sudah punya @keyframes spinning → dua rotasi konflik.
+//  Bodi dan roda keduanya di-update dalam satu rAF loop yang
+//  sama sehingga posisi & timing selalu sinkron.
 //
-//  SOLUSI: pisah jadi 2 elemen SVG terpisah:
-//    1. <g id="car-body">   → ikut animateMotion + rotate="auto"
-//                              berisi bodi + jendela + lampu saja
-//    2. <g id="car-wheels"> → posisi di-update manual
-//                              via requestAnimationFrame
-//                              roda TIDAK ikut rotate path
+//  car-body   → translate + rotate(angle) dari samplePathAngle()
+//  car-wheels → translate saja, spin dari CSS @keyframes spinning
 // ══════════════════════════════════════════════════════════════
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
@@ -612,59 +626,73 @@ function samplePathPos(path, t) {
   return { ...positions[path[path.length - 1]] };
 }
 
+// Hitung angle arah gerak di titik t (finite difference)
+function samplePathAngle(path, t) {
+  const EPS = 0.005;
+  const p1 = samplePathPos(path, Math.max(0, t - EPS));
+  const p2 = samplePathPos(path, Math.min(1, t + EPS));
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+}
+
 async function moveCar(path, distance) {
   const carBody = document.getElementById("car-body");
   const carWheels = document.getElementById("car-wheels");
 
-  // hapus animasi lama agar tidak stuck di posisi sebelumnya
   document.getElementById("car-anim-body")?.remove();
 
   const pathD = buildPathD(path);
-  const dur = Math.max(1.5, distance / 150);
+  const safeDist = (isFinite(distance) && distance > 0) ? distance : 300;
+  const dur = Math.max(1.5, safeDist / 150);
+  const durMs = dur * 1000;
 
-  // highlight path merah (dari original)
   const hp = document.getElementById("highlight-path");
   hp.setAttribute("d", pathD);
   hp.setAttribute("opacity", "0.85");
 
-  // ── 1. bodi mobil: animateMotion + rotate="auto" ──────────
   carBody.setAttribute("opacity", "1");
-  const animBody = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
-  animBody.setAttribute("id", "car-anim-body");
-  animBody.setAttribute("dur", `${dur}s`);
-  animBody.setAttribute("fill", "freeze");
-  animBody.setAttribute("rotate", "auto");   // bodi menghadap arah jalan
-  animBody.setAttribute("path", pathD);
-  carBody.appendChild(animBody);
-  animBody.beginElement();
-
-  // ── 2. roda: posisi manual, spin CSS saja ─────────────────
-  // aktifkan spin HANYA saat bergerak
-  document.querySelectorAll(".wheel-inner").forEach(w => w.classList.add("wheel-spin"));
   carWheels.setAttribute("opacity", "1");
+  document.querySelectorAll(".wheel-inner").forEach(w => w.classList.add("wheel-spin"));
 
-  const t0 = performance.now(), durMs = dur * 1000;
+  const t0 = performance.now();
 
-  function frame(now) {
-    const t = Math.min((now - t0) / durMs, 1);
-    const pos = samplePathPos(path, t);
-    carWheels.setAttribute("transform", `translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)})`);
-    if (t < 1) {
-      requestAnimationFrame(frame);
-    } else {
-      // selesai: sembunyikan roda, matikan spin
-      carWheels.setAttribute("opacity", "0");
-      document.querySelectorAll(".wheel-inner").forEach(w => w.classList.remove("wheel-spin"));
+  await new Promise(resolve => {
+    function frame(now) {
+      const t = Math.min((now - t0) / durMs, 1);
+      const pos = samplePathPos(path, t);
+      const ang = samplePathAngle(path, t);
+
+      // Body + wheels keduanya pakai rAF — timing identik, tidak ada konflik
+      carBody.setAttribute("transform",
+        `translate(${pos.x.toFixed(2)},${pos.y.toFixed(2)}) rotate(${ang.toFixed(2)})`);
+      carWheels.setAttribute("transform",
+        `translate(${pos.x.toFixed(2)},${pos.y.toFixed(2)})`);
+
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        carBody.setAttribute("opacity", "0");
+        carWheels.setAttribute("opacity", "0");
+        document.querySelectorAll(".wheel-inner").forEach(w => w.classList.remove("wheel-spin"));
+        resolve();
+      }
     }
-  }
-  requestAnimationFrame(frame);
-
-  await wait(durMs);
+    requestAnimationFrame(frame);
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
-//  STEP-BY-STEP VISUAL DI PETA (bobot 40 poin)
-//  Tampilkan nilai dist= / f=g+h / hop= langsung di atas node
+//  STEP-BY-STEP VISUAL DI PETA
+//  ─────────────────────────────────────────────────────────────
+//  @contributor  Yehezkiel Alman
+//                (Visualisasi Graf, Animasi Step-by-Step,
+//                 samplePathPos(), buildPathD(), Struktur Graf)
+//
+//  animateVisited() menampilkan proses eksplorasi node secara
+//  visual, satu per satu sesuai urutan kunjungan algoritma.
+//  Label nilai (dist= / f=g+h / hop=) muncul di atas tiap node
+//  untuk menggambarkan proses pencarian rute step-by-step.
+//
+//  Kompleksitas: O(V) — iterasi tiap node yang dikunjungi
 // ══════════════════════════════════════════════════════════════
 const aniDelay = () => wait(Math.max(10, 200 / SPEED));
 
@@ -728,9 +756,9 @@ function lg(msg, cls = "inf") {
   d.className = "ll " + cls;
   d.textContent = msg;
   b.appendChild(d);
-  b.scrollTop = b.scrollHeight;
+  b.scrollTop = b.scrollHeight;     // auto-scroll ke bawah
 }
-function lgSep() { lg("─".repeat(36), "sep"); }
+function lgSep() { lg("─".repeat(36), "sep"); }       // pemisah antar algoritma
 function clearLog() { document.getElementById("log-body").innerHTML = ""; }
 
 // ── Reset results ─────────────────────────────────────────────
@@ -747,7 +775,10 @@ function resetResults() {
   ["card-d", "card-a", "card-b"].forEach(id => document.getElementById(id)?.classList.remove("win-card"));
 }
 
-// ── Show results & evaluasi (bobot 30 poin) ───────────────────
+// ── Show results & evaluasi algoritma ────────────────────────
+// @contributor  Neza Khairunnisa Rahmah
+//               (showResults, tabel perbandingan, evaluasi kelebihan
+//                & kekurangan tiap algoritma, winner badge)
 function showResults(rD, rA, rB) {
   const maxT = Math.max(rD?.timeMs || 0, rA?.timeMs || 0, rB?.timeMs || 0) || 1;
   const maxN = Math.max(rD?.visited?.length || 0, rA?.visited?.length || 0, rB?.visited?.length || 0) || 1;
@@ -872,7 +903,18 @@ function showResults(rD, rA, rB) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  MAIN SIMULATION
+//  MAIN SIMULATION — Integrasi Ketiga Algoritma
+//  ─────────────────────────────────────────────────────────────
+//  @contributor  Raihan Darma Putra
+//                (startSimulation(), integrasi BFS + Dijkstra + A*,
+//                 timing eksekusi, logging, kurir bergerak)
+//
+//  Urutan eksekusi:
+//    1. BFS     → baseline, animateVisited (oranye)
+//    2. Dijkstra → greedy optimal, animateVisited (biru)
+//    3. A*       → informed search, animateVisited (ungu)
+//    4. showResults() → evaluasi & perbandingan
+//    5. moveCar() → kurir bergerak di jalur Dijkstra
 // ══════════════════════════════════════════════════════════════
 async function startSimulation() {
   if (simRunning) return;
@@ -886,7 +928,7 @@ async function startSimulation() {
   clearLog();
   resetResults();
 
-  lg(`[SIM] ${start} → ${end} | ${Object.keys(graph).length} node, ${countEdges(graph)} edge`, "inf");
+  lg(`[SIM] ${start} → ${end} | ${Object.keys(graph).length} node, (graph)} edge`, "inf");
   lgSep();
 
   // ── BFS ────────────────────────────────────────────────────
@@ -962,7 +1004,11 @@ async function startSimulation() {
   document.getElementById("run-btn").disabled = false;
 }
 
-// ── Broken roads ──────────────────────────────────────────────
+// ── Broken roads (Jalan Rusak) ────────────────────────────────
+// @contributor  Elsha Natalia Panjaitan
+//               (generateBrokenRoads() — memblokir 3 edge acak
+//                dengan menambahkan bobot +9999, memaksa algoritma
+//                mencari jalur alternatif)
 function generateBrokenRoads() {
   resetRoads();
   const all = [];
@@ -996,7 +1042,12 @@ function resetRoads() {
   drawWeightLabels();
 }
 
-// ── Randomize map ─────────────────────────────────────────────
+// ── Randomize map (Acak Peta) ────────────────────────────────
+// @contributor  Yehezkiel Alman
+//               (randomizeMap() — generate graf acak 7-11 node,
+//                posisi node non-overlap, edge non-crossing,
+//                Prim spanning tree untuk konektivitas,
+//                acak start & end untuk anti-hardcode)
 function randomizeMap() {
   const W = 1000, H = 650, PAD = 75, MIN_D = 130, MAX_E = 430;
   const nc = ri(7, 11);

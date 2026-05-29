@@ -5,34 +5,37 @@ body {
   margin: 0;
   background: #dfefff;
   font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 20px;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  grid-template-rows: 100vh;
+  gap: 0;
+  overflow: hidden;
 }
 
 h1 {
-  margin-bottom: 10px;
+  margin: 0 0 6px 0;
   color: #333;
+  font-size: 18px;
 }
 
 .panel {
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   display: flex;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
   flex-wrap: wrap;
   background: white;
-  padding: 15px 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 8px 14px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 select,
 button {
-  padding: 8px 12px;
-  font-size: 16px;
+  padding: 5px 10px;
+  font-size: 13px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
@@ -80,12 +83,21 @@ button:disabled {
 }
 
 /* ── MAP ── */
+#svg-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
 svg#map {
   background: #7bb565;
-  border: 4px solid #333;
-  border-radius: 12px;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
-  flex-shrink: 0;
+  border: 3px solid #333;
+  border-radius: 10px;
+  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .node {
@@ -165,21 +177,19 @@ svg#map {
 
 /* ── RESULT BOX ── */
 #result {
-  margin-top: 15px;
-  font-size: 16px;
+  margin-top: 8px;
+  font-size: 13px;
   font-weight: bold;
   background: white;
-  padding: 10px 20px;
+  padding: 7px 14px;
   border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
-  min-width: 400px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── STEP COUNTER overlay di atas SVG ── */
-#svg-wrap {
-  position: relative;
-}
 
 #step-ctr {
   display: none;
@@ -201,7 +211,9 @@ svg#map {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex-shrink: 0;
+  padding: 12px 12px 12px 14px;
+  overflow: hidden;
+  min-width: 0;
 }
 
 /* ══════════════════════════════════════════
@@ -214,6 +226,20 @@ svg#map {
   min-width: 305px;
   max-width: 340px;
   align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  box-sizing: border-box;
+}
+
+#right-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+#right-panel::-webkit-scrollbar-thumb {
+  background: #b0c4de;
+  border-radius: 4px;
 }
 
 /* algo cards */
