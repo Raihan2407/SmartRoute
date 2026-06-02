@@ -2,7 +2,7 @@
 
 > **Final Project** · Perancangan dan Analisis Algoritma (INF11111)  
 > Teknik Informatika · Universitas Maritim Raja Ali Haji · Semester Genap 2025/2026  
-> Dosen Pengampu: 
+> Dosen Pengampu: Tekad Matulatan, S.Sos., S.Kom., M.Inf.Tech & Muhammad Fadli, M.Kom
 
 ---
 
